@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { getToken } from '../lib/auth';
 import { formatApiError } from '../lib/formatError';
 import { Button, Card, ErrorText, Input, Label } from '../components/ui';
+import './AppPages.css';
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
@@ -81,19 +82,19 @@ export function Availability() {
   if (loading) return <div style={{ color: '#64748b', fontWeight: 700 }}>Loading…</div>;
 
   return (
-    <div style={{ display: 'grid', gap: 14, maxWidth: 820 }}>
-      <Card>
-        <div style={{ fontWeight: 900, fontSize: 18 }}>Availability</div>
-        <div style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>Set when you’re typically available.</div>
-      </Card>
+    <div className="availability-wrap">
+      <div className="app-hero-card">
+        <h1 className="app-hero-title">Availability</h1>
+        <p className="app-hero-subtitle">Set your preferred hours so people only book when it works for you.</p>
+      </div>
 
       <Card>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="availability-config-grid">
           <div>
             <Label>Timezone (IANA)</Label>
             <Input value={timezone} onChange={(e) => setTimezone(e.target.value)} placeholder="Asia/Karachi" />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="availability-config-grid">
             <div>
               <Label>Min notice (minutes)</Label>
               <Input
@@ -115,7 +116,7 @@ export function Availability() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+        <div className="availability-config-grid" style={{ marginTop: 12 }}>
           <div>
             <Label>Buffer before (minutes)</Label>
             <Input
@@ -138,7 +139,8 @@ export function Availability() {
       </Card>
 
       <Card>
-        <div style={{ fontWeight: 900 }}>Weekly hours</div>
+        <div className="app-section-title">Weekly hours</div>
+        <div className="app-section-subtitle">Enable the days you want to accept meetings.</div>
         <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
           {DOW.map((label, dayOfWeek) => {
             const windows = weeklyByDay.get(dayOfWeek) ?? [];
@@ -148,15 +150,7 @@ export function Availability() {
             const end = enabled ? minuteToHHMM(win.endMinute) : '17:00';
 
             return (
-              <div
-                key={dayOfWeek}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '90px 1fr 1fr 140px',
-                  gap: 10,
-                  alignItems: 'center',
-                }}
-              >
+              <div key={dayOfWeek} className="availability-week-row">
                 <div style={{ fontWeight: 900, color: '#334155' }}>{label}</div>
                 <div>
                   <Input

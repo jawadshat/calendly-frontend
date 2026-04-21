@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { setToken } from '../lib/auth';
 import { formatApiError } from '../lib/formatError';
 import { Button, Card, ErrorText, Input, Label } from '../components/ui';
+import './AppChrome.css';
 
 export function Register() {
   const navigate = useNavigate();
@@ -16,14 +17,18 @@ export function Register() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div style={{ maxWidth: 520, margin: '40px auto' }}>
+    <div className="auth-wrap">
+      <div className="auth-hero">
+        <h2>Create your account</h2>
+        <p>Start sharing your beautiful scheduling page in minutes.</p>
+      </div>
       <Card>
         <h2 style={{ margin: 0 }}>Create your account</h2>
         <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>
           Choose a username — it becomes your public scheduling link.
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
+        <div className="auth-grid-2" style={{ marginTop: 16 }}>
           <div>
             <Label>Display name</Label>
             <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Jawad" />
@@ -58,8 +63,8 @@ export function Register() {
           </div>
         ) : null}
 
-        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <Link to="/login" style={{ color: '#334155', fontWeight: 700, textDecoration: 'none' }}>
+        <div className="auth-footer">
+          <Link to="/login" className="auth-link">
             Already have an account?
           </Link>
           <Button

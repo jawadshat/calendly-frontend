@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { getToken } from '../lib/auth';
 import { Button, Card, ErrorText, Input, Label, Textarea } from '../components/ui';
+import './AppChrome.css';
+import './AppPages.css';
 
 export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
   const navigate = useNavigate();
@@ -61,11 +63,16 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
   if (initialLoading) return <div style={{ color: '#64748b', fontWeight: 700 }}>Loading…</div>;
 
   return (
-    <div style={{ maxWidth: 700 }}>
-      <Card>
-        <div style={{ fontWeight: 900, fontSize: 18 }}>{heading}</div>
+    <div className="editor-wrap">
+      <div className="app-hero-card">
+        <h1 className="app-hero-title">{heading}</h1>
+        <p className="app-hero-subtitle">Create professional event links with clear titles, durations, and descriptions.</p>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
+      <Card>
+        <div className="app-section-title">{heading}</div>
+
+        <div className="editor-grid" style={{ marginTop: 16 }}>
           <div>
             <Label>Title</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -76,7 +83,7 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+        <div className="editor-grid" style={{ marginTop: 12 }}>
           <div>
             <Label>Duration (minutes)</Label>
             <Input

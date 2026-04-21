@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { getToken, logout } from '../lib/auth';
+import '../pages/AppChrome.css';
 
 export function Layout() {
   const navigate = useNavigate();
@@ -7,61 +8,33 @@ export function Layout() {
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          background: 'rgba(255,255,255,0.75)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1100,
-            margin: '0 auto',
-            padding: '14px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-          }}
-        >
-          <Link to="/" style={{ textDecoration: 'none', color: '#0f172a', fontWeight: 800, letterSpacing: -0.3 }}>
-            <span style={{ color: 'var(--primary)' }}>C</span>alendlyClone
+      <header className="app-top">
+        <div className="app-top-inner">
+          <Link to="/" className="app-brand">
+            <span>C</span>alendlyClone
           </Link>
 
-          <nav style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <nav className="app-nav">
             {authed ? (
               <>
                 <NavLink
                   to="/dashboard"
-                  style={({ isActive }) => ({
-                    textDecoration: 'none',
-                    color: isActive ? '#0f172a' : '#334155',
-                    fontWeight: 600,
-                  })}
+                  style={{ textDecoration: 'none' }}
+                  className={({ isActive }) => `app-nav-link${isActive ? ' active' : ''}`}
                 >
                   Dashboard
                 </NavLink>
                 <NavLink
                   to="/dashboard/bookings"
-                  style={({ isActive }) => ({
-                    textDecoration: 'none',
-                    color: isActive ? '#0f172a' : '#334155',
-                    fontWeight: 600,
-                  })}
+                  style={{ textDecoration: 'none' }}
+                  className={({ isActive }) => `app-nav-link${isActive ? ' active' : ''}`}
                 >
                   Scheduled events
                 </NavLink>
                 <NavLink
                   to="/dashboard/availability"
-                  style={({ isActive }) => ({
-                    textDecoration: 'none',
-                    color: isActive ? '#0f172a' : '#334155',
-                    fontWeight: 600,
-                  })}
+                  style={{ textDecoration: 'none' }}
+                  className={({ isActive }) => `app-nav-link${isActive ? ' active' : ''}`}
                 >
                   Availability
                 </NavLink>
@@ -84,7 +57,7 @@ export function Layout() {
               </>
             ) : (
               <>
-                <Link to="/login" style={{ textDecoration: 'none', color: '#334155', fontWeight: 700 }}>
+                <Link to="/login" className="app-nav-link">
                   Log in
                 </Link>
                 <Link
@@ -107,7 +80,7 @@ export function Layout() {
         </div>
       </header>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 16px' }}>
+      <main className="app-main">
         <Outlet />
       </main>
     </div>

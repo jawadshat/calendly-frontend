@@ -5,6 +5,7 @@ import { api } from '../lib/api';
 import { getToken } from '../lib/auth';
 import { formatApiError } from '../lib/formatError';
 import { Card, ErrorText } from '../components/ui';
+import './AppPages.css';
 
 export function Bookings() {
   const navigate = useNavigate();
@@ -35,13 +36,41 @@ export function Bookings() {
   if (error) return <ErrorText>{error}</ErrorText>;
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
-      <Card>
-        <div style={{ fontWeight: 950, fontSize: 18 }}>Scheduled events</div>
-        <div className="cc-muted" style={{ marginTop: 6, fontSize: 13 }}>
-          Upcoming bookings created from your public scheduling links.
+    <div className="app-shell">
+      <div className="app-hero-card">
+        <h1 className="app-hero-title">Scheduled Events</h1>
+        <p className="app-hero-subtitle">Track upcoming meetings booked through your event links.</p>
+      </div>
+
+      <div className="app-grid-4">
+        <div className="app-stat">
+          <div className="app-stat-label">Total Bookings</div>
+          <div className="app-stat-value">{items.length}</div>
         </div>
-      </Card>
+        <div className="app-stat">
+          <div className="app-stat-label">Upcoming</div>
+          <div className="app-stat-value">{items.filter((b) => new Date(b.startUtc).getTime() > Date.now()).length}</div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">This Week</div>
+          <div className="app-stat-value">
+            {
+              items.filter((b) => {
+                const now = Date.now();
+                const end = now + 7 * 24 * 60 * 60 * 1000;
+                const t = new Date(b.startUtc).getTime();
+                return t >= now && t <= end;
+              }).length
+            }
+          </div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Status</div>
+          <div className="app-stat-value" style={{ fontSize: 18 }}>
+            Active
+          </div>
+        </div>
+      </div>
 
       {items.length === 0 ? (
         <Card>
@@ -50,21 +79,24 @@ export function Bookings() {
           </div>
         </Card>
       ) : (
-        items.map((b) => {
+        <div className="bookings-list">
+          {items.map((b) => {
           const start = DateTime.fromISO(new Date(b.startUtc).toISOString(), { zone: 'utc' }).toLocal();
           return (
             <Card key={b._id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'start' }}>
+              <div className="booking-row">
                 <div>
-                  <div style={{ fontWeight: 950 }}>{start.toFormat('cccc, LLL d • h:mm a')}</div>
+                  <div style={{ fontWeight: 950, fontSize: 16 }}>{start.toFormat('cccc, LLL d • h:mm a')}</div>
                   <div className="cc-muted" style={{ fontSize: 13, marginTop: 6 }}>
                     Invitee: {b.inviteeName} ({b.inviteeEmail})
                   </div>
                 </div>
+                <span className="booking-pill">Confirmed</span>
               </div>
             </Card>
           );
-        })
+          })}
+        </div>
       )}
     </div>
   );

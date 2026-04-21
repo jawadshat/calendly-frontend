@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { setToken } from '../lib/auth';
 import { formatApiError } from '../lib/formatError';
 import { Button, Card, ErrorText, Input, Label } from '../components/ui';
+import './AppChrome.css';
 
 export function Login() {
   const navigate = useNavigate();
@@ -13,7 +14,11 @@ export function Login() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div style={{ maxWidth: 460, margin: '40px auto' }}>
+    <div className="auth-wrap">
+      <div className="auth-hero">
+        <h2>Welcome back</h2>
+        <p>Log in to manage your calendar links and bookings.</p>
+      </div>
       <Card>
         <h2 style={{ margin: 0 }}>Log in</h2>
         <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>Access your scheduling dashboard.</div>
@@ -38,8 +43,8 @@ export function Login() {
           </div>
         ) : null}
 
-        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <Link to="/register" style={{ color: '#334155', fontWeight: 700, textDecoration: 'none' }}>
+        <div className="auth-footer">
+          <Link to="/register" className="auth-link">
             Create account
           </Link>
           <Button

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { getToken } from '../lib/auth';
 import { Button, Card } from '../components/ui';
+import './AppPages.css';
 
 export function Dashboard() {
   const navigate = useNavigate();
@@ -47,11 +48,37 @@ export function Dashboard() {
     Number(availability?.maxDaysInFuture ?? 0) > 0;
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14 }}>
+    <div className="app-shell">
+      <div className="app-hero-card">
+        <h1 className="app-hero-title">Dashboard</h1>
+        <p className="app-hero-subtitle">Manage your event types, booking links, and scheduling setup.</p>
+      </div>
+
+      <div className="app-grid-4">
+        <div className="app-stat">
+          <div className="app-stat-label">Event Types</div>
+          <div className="app-stat-value">{items.length}</div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Availability</div>
+          <div className="app-stat-value">{hasAvailability ? 'Ready' : 'Pending'}</div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Timezone</div>
+          <div className="app-stat-value" style={{ fontSize: 18 }}>
+            {availability?.timezone ?? 'UTC'}
+          </div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Max Days Ahead</div>
+          <div className="app-stat-value">{availability?.maxDaysInFuture ?? 0}</div>
+        </div>
+      </div>
+
       {!hasAvailability ? (
         <Card>
-          <div style={{ fontWeight: 900, fontSize: 16 }}>Set availability first</div>
-          <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>
+          <div className="app-section-title">Set availability first</div>
+          <div className="app-section-subtitle">
             Your scheduling links are generated only after you define your availability timings and date window.
           </div>
           <div style={{ marginTop: 12 }}>
@@ -63,12 +90,10 @@ export function Dashboard() {
       ) : null}
 
       <Card>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
+        <div className="app-section-head">
           <div>
-            <div style={{ fontWeight: 900, fontSize: 18 }}>Event Types</div>
-            <div style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
-              Share a link so others can book time on your calendar.
-            </div>
+            <h2 className="app-section-title">Event Types</h2>
+            <p className="app-section-subtitle">Share a link so others can book time on your calendar.</p>
           </div>
           {hasAvailability ? (
             <Link to="/dashboard/event-types/new">
@@ -84,34 +109,34 @@ export function Dashboard() {
 
       {items.length === 0 ? (
         <Card>
-          <div style={{ color: '#64748b', fontWeight: 700 }}>
+          <div className="app-muted" style={{ fontWeight: 700 }}>
             No event types yet. Create one to get a scheduling link.
           </div>
         </Card>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+        <div className="app-grid-2">
           {items.map((it) => (
-            <Card key={it._id}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'start' }}>
+            <Card key={it._id} style={{ padding: 18 }}>
+              <div className="app-event-card" style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'start' }}>
                 <div>
-                  <div style={{ fontWeight: 900 }}>{it.title}</div>
-                  <div style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
+                  <h3 className="app-event-title">{it.title}</h3>
+                  <div className="app-muted" style={{ marginTop: 4 }}>
                     {it.durationMinutes} min • slug: <span style={{ fontFamily: 'monospace' }}>{it.slug}</span>
                   </div>
                   {username && hasAvailability ? (
-                    <div style={{ marginTop: 10, fontSize: 13 }}>
+                    <div className="app-link" style={{ marginTop: 10 }}>
                       Generated link:{' '}
                       <a
                         href={`/${encodeURIComponent(String(username).trim().toLowerCase())}/${encodeURIComponent(
                           String(it.slug).trim().toLowerCase(),
                         )}`}
-                        style={{ fontWeight: 800 }}
+                        style={{ fontWeight: 800, color: 'inherit' }}
                       >
                         /{String(username).trim().toLowerCase()}/{String(it.slug).trim().toLowerCase()}
                       </a>
                     </div>
                   ) : (
-                    <div style={{ marginTop: 10, fontSize: 13, color: '#64748b' }}>
+                    <div className="app-muted" style={{ marginTop: 10 }}>
                       Configure availability first to generate shareable link.
                     </div>
                   )}
