@@ -4,6 +4,10 @@ body,
   height: 100%;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --bg: #f6f8ff;
   --card: #ffffff;
@@ -31,6 +35,20 @@ body {
     "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 a {

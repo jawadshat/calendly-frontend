@@ -23,6 +23,8 @@ type Weekly = { dayOfWeek: number; startMinute: number; endMinute: number };
 
 export function Availability() {
   const navigate = useNavigate();
+  const [eventTypes, setEventTypes] = useState<any[]>([]);
+  const [selectedEventTypeId, setSelectedEventTypeId] = useState('');
   const [timezone, setTimezone] = useState('UTC');
   const [bufferBeforeMinutes, setBufferBeforeMinutes] = useState(0);
   const [bufferAfterMinutes, setBufferAfterMinutes] = useState(0);
@@ -51,8 +53,13 @@ export function Availability() {
       try {
         setLoading(true);
         setError(null);
-        const me = await api.me();
-        const a = me.availability;
+        const [me, eventTypesRes] = await Promise.all([api.me(), api.listEventTypes()]);
+        setEventTypes(eventTypesRes.items ?? []);
+        const firstEventTypeId = eventTypesRes.items?.[0]?._id ? String(eventTypesRes.items[0]._id) : '';
+        setSelectedEventTypeId(firstEventTypeId);
+        const a = firstEventTypeId
+          ? (await api.eventTypeAvailability(firstEventTypeId)).availability
+          : me.availability;
         if (a) {
           setTimezone(a.timezone ?? 'UTC');
           setBufferBeforeMinutes(a.bufferBeforeMinutes ?? 0);
@@ -79,7 +86,31 @@ export function Availability() {
     return map;
   }, [weekly]);
 
+  const selectedEventType = useMemo(
+    () => eventTypes.find((it) => String(it._id) === selectedEventTypeId),
+    [eventTypes, selectedEventTypeId],
+  );
+
   if (loading) return <div style={{ color: '#64748b', fontWeight: 700 }}>Loading…</div>;
+
+  async function loadAvailabilityForEventType(eventTypeId: string) {
+    const a = (await api.eventTypeAvailability(eventTypeId)).availability;
+    if (!a) {
+      setTimezone('UTC');
+      setBufferBeforeMinutes(0);
+      setBufferAfterMinutes(0);
+      setMinNoticeMinutes(60);
+      setMaxDaysInFuture(60);
+      setWeekly([]);
+      return;
+    }
+    setTimezone(a.timezone ?? 'UTC');
+    setBufferBeforeMinutes(a.bufferBeforeMinutes ?? 0);
+    setBufferAfterMinutes(a.bufferAfterMinutes ?? 0);
+    setMinNoticeMinutes(a.minNoticeMinutes ?? 60);
+    setMaxDaysInFuture(a.maxDaysInFuture ?? 60);
+    setWeekly(Array.isArray(a.weekly) ? a.weekly : []);
+  }
 
   return (
     <div className="availability-wrap">
@@ -89,6 +120,51 @@ export function Availability() {
       </div>
 
       <Card>
+        <div className="availability-event-card">
+          <div>
+            <div className="availability-event-card-title">Event type schedule</div>
+            <div className="availability-event-card-subtitle">Each event type can have a different weekly routine.</div>
+          </div>
+          <div className="availability-event-type-list">
+            {eventTypes.length === 0 ? (
+              <div className="availability-event-empty">Create an event type first to set availability.</div>
+            ) : (
+              eventTypes.map((it) => {
+                const isActive = String(it._id) === selectedEventTypeId;
+                return (
+                  <button
+                    key={it._id}
+                    type="button"
+                    className={`availability-event-chip${isActive ? ' is-active' : ''}`}
+                    onClick={async () => {
+                      const nextId = String(it._id);
+                      if (nextId === selectedEventTypeId) return;
+                      setSelectedEventTypeId(nextId);
+                      setError(null);
+                      setSavedAt(null);
+                      try {
+                        await loadAvailabilityForEventType(nextId);
+                      } catch (err: any) {
+                        setError(err?.error ?? 'Failed to load event type availability');
+                      }
+                    }}
+                  >
+                    <span className="availability-event-chip-title">{it.title}</span>
+                    <span className="availability-event-chip-meta">
+                      {it.durationMinutes}m • /{it.slug}
+                    </span>
+                  </button>
+                );
+              })
+            )}
+          </div>
+          {selectedEventType ? (
+            <div className="availability-event-selected">
+              Editing: <strong>{selectedEventType.title}</strong> ({selectedEventType.durationMinutes} mins)
+            </div>
+          ) : null}
+        </div>
+
         <div className="availability-config-grid">
           <div>
             <Label>Timezone (IANA)</Label>
@@ -212,13 +288,17 @@ export function Availability() {
 
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'end' }}>
           <Button
-            disabled={saving}
+            disabled={saving || !selectedEventTypeId}
             onClick={async () => {
               try {
                 setSaving(true);
                 setError(null);
                 setSavedAt(null);
-                await api.updateAvailability({
+                if (!selectedEventTypeId) {
+                  setError('Create an event type first');
+                  return;
+                }
+                await api.updateEventTypeAvailability(selectedEventTypeId, {
                   timezone,
                   weekly,
                   bufferBeforeMinutes,
@@ -226,17 +306,7 @@ export function Availability() {
                   minNoticeMinutes,
                   maxDaysInFuture,
                 });
-                // reload from server so you can see the saved values persisted
-                const me = await api.me();
-                const a = me.availability;
-                if (a) {
-                  setTimezone(a.timezone ?? 'UTC');
-                  setBufferBeforeMinutes(a.bufferBeforeMinutes ?? 0);
-                  setBufferAfterMinutes(a.bufferAfterMinutes ?? 0);
-                  setMinNoticeMinutes(a.minNoticeMinutes ?? 60);
-                  setMaxDaysInFuture(a.maxDaysInFuture ?? 60);
-                  setWeekly(Array.isArray(a.weekly) ? a.weekly : []);
-                }
+                await loadAvailabilityForEventType(selectedEventTypeId);
                 setSavedAt(Date.now());
               } catch (e: any) {
                 setError(formatApiError(e));

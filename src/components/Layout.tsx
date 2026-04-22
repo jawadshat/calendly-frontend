@@ -5,9 +5,10 @@ import '../pages/AppChrome.css';
 export function Layout() {
   const navigate = useNavigate();
   const authed = Boolean(getToken());
+  const year = new Date().getFullYear();
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div className="app-shell-root">
       <header className="app-top">
         <div className="app-top-inner">
           <Link to="/" className="app-brand">
@@ -39,17 +40,10 @@ export function Layout() {
                   Availability
                 </NavLink>
                 <button
+                  className="app-logout-btn"
                   onClick={() => {
                     logout();
                     navigate('/');
-                  }}
-                  style={{
-                    border: '1px solid #e2e8f0',
-                    background: 'white',
-                    padding: '8px 12px',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    fontWeight: 700,
                   }}
                 >
                   Log out
@@ -83,6 +77,18 @@ export function Layout() {
       <main className="app-main">
         <Outlet />
       </main>
+
+      <footer className="app-footer">
+        <div className="app-footer-inner">
+          <div className="app-footer-left">
+            <div className="app-footer-brand">
+              <span>C</span>alendlyClone
+            </div>
+            <div className="app-footer-copy">Smarter scheduling for modern teams.</div>
+          </div>
+          <div className="app-footer-meta">© {year} CalendlyClone. Crafted with care.</div>
+        </div>
+      </footer>
     </div>
   );
 }

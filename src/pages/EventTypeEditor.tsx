@@ -20,7 +20,6 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(props.mode === 'edit');
-  const [hasAvailability, setHasAvailability] = useState(true);
 
   useEffect(() => {
     if (!getToken()) navigate('/login');
@@ -32,11 +31,6 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
     (async () => {
       try {
         setInitialLoading(true);
-        const me = await api.me();
-        const a = me?.availability;
-        const ok =
-          Boolean(a?.timezone) && Array.isArray(a?.weekly) && a.weekly.length > 0 && Number(a?.maxDaysInFuture ?? 0) > 0;
-        setHasAvailability(ok);
 
         if (props.mode !== 'edit') return;
 
@@ -112,20 +106,12 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
             <ErrorText>{error}</ErrorText>
           </div>
         ) : null}
-        {!hasAvailability ? (
-          <div style={{ marginTop: 12 }}>
-            <ErrorText>
-              Set availability timings/date window first in Availability before creating or sharing event links.
-            </ErrorText>
-          </div>
-        ) : null}
-
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', gap: 10 }}>
           <Button variant="secondary" onClick={() => navigate('/dashboard')}>
             Back
           </Button>
           <Button
-            disabled={loading || !hasAvailability}
+            disabled={loading}
             onClick={async () => {
               try {
                 setLoading(true);

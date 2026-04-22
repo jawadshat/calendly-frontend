@@ -61,7 +61,11 @@ export const api = {
     request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
 
   me: () => request<any>('/me'),
-  updateAvailability: (body: any) => request<any>('/me/availability', { method: 'PUT', body: JSON.stringify(body) }),
+  updateAvailability: (body: any, eventTypeId?: string) =>
+    request<any>(
+      `/me/availability${eventTypeId ? `?eventTypeId=${encodeURIComponent(eventTypeId)}` : ''}`,
+      { method: 'PUT', body: JSON.stringify(body) },
+    ),
   myBookings: () => request<{ items: any[] }>('/me/bookings'),
 
   listEventTypes: () => request<{ items: any[] }>('/event-types'),
@@ -69,6 +73,9 @@ export const api = {
   updateEventType: (id: string, body: any) =>
     request<any>(`/event-types/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteEventType: (id: string) => request<any>(`/event-types/${id}`, { method: 'DELETE' }),
+  eventTypeAvailability: (id: string) => request<any>(`/event-types/${id}/availability`),
+  updateEventTypeAvailability: (id: string, body: any) =>
+    request<any>(`/event-types/${id}/availability`, { method: 'PUT', body: JSON.stringify(body) }),
 
   publicEventTypes: (username: string) => request<any>(`/public/users/${username}/event-types`),
   publicSlots: (username: string, slug: string, startUtcISO: string, endUtcISO: string) =>
