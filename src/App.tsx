@@ -8,6 +8,8 @@ import { EventTypeEditor } from "./pages/EventTypeEditor";
 import { Availability } from "./pages/Availability";
 import { Bookings } from "./pages/Bookings";
 import { PublicBooking } from "./pages/PublicBooking";
+import { Analytics } from "./pages/Analytics";
+import { ProfileSettings } from "./pages/ProfileSettings";
 
 function NormalizePath() {
   const location = useLocation();
@@ -34,6 +36,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/analytics" element={<Analytics />} />
           <Route path="/dashboard/bookings" element={<Bookings />} />
           <Route
             path="/dashboard/event-types/new"
@@ -44,6 +47,7 @@ export default function App() {
             element={<EventTypeEditor mode="edit" />}
           />
           <Route path="/dashboard/availability" element={<Availability />} />
+          <Route path="/dashboard/profile" element={<ProfileSettings />} />
         </Route>
 
         {/* public booking url like calendly.com/username/event */}

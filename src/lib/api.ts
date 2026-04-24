@@ -61,6 +61,8 @@ export const api = {
     request<{ token: string }>('/auth/login', { method: 'POST', body: JSON.stringify(body) }),
 
   me: () => request<any>('/me'),
+  googleCalendarConnectUrl: () => request<{ url: string }>('/me/google-calendar/connect-url'),
+  googleCalendarDisconnect: () => request<{ ok: boolean }>('/me/google-calendar/disconnect', { method: 'POST' }),
   updateAvailability: (body: any, eventTypeId?: string) =>
     request<any>(
       `/me/availability${eventTypeId ? `?eventTypeId=${encodeURIComponent(eventTypeId)}` : ''}`,

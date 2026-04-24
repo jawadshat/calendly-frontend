@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api';
 import { getToken } from '../lib/auth';
 import { formatApiError } from '../lib/formatError';
@@ -23,6 +23,7 @@ type Weekly = { dayOfWeek: number; startMinute: number; endMinute: number };
 
 export function Availability() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [eventTypes, setEventTypes] = useState<any[]>([]);
   const [selectedEventTypeId, setSelectedEventTypeId] = useState('');
   const [timezone, setTimezone] = useState('UTC');
@@ -43,6 +44,9 @@ export function Availability() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [googleStatus, setGoogleStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!getToken()) navigate('/login');
@@ -54,6 +58,8 @@ export function Availability() {
         setLoading(true);
         setError(null);
         const [me, eventTypesRes] = await Promise.all([api.me(), api.listEventTypes()]);
+        setGoogleConnected(Boolean(me?.googleCalendarConnected));
+        setGoogleEmail(me?.googleCalendarEmail ?? null);
         setEventTypes(eventTypesRes.items ?? []);
         const firstEventTypeId = eventTypesRes.items?.[0]?._id ? String(eventTypesRes.items[0]._id) : '';
         setSelectedEventTypeId(firstEventTypeId);
@@ -75,6 +81,15 @@ export function Availability() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    const google = searchParams.get('google');
+    if (!google) return;
+    if (google === 'connected') setGoogleStatus('Google Calendar connected successfully.');
+    else if (google === 'not-configured') setGoogleStatus('Google Calendar is not configured on server.');
+    else if (google === 'invalid-state') setGoogleStatus('Google Calendar connect session expired. Try again.');
+    else setGoogleStatus('Google Calendar connection failed. Please retry.');
+  }, [searchParams]);
 
   const weeklyByDay = useMemo(() => {
     const map = new Map<number, Weekly[]>();
@@ -118,6 +133,47 @@ export function Availability() {
         <h1 className="app-hero-title">Availability</h1>
         <p className="app-hero-subtitle">Set your preferred hours so people only book when it works for you.</p>
       </div>
+
+      <Card>
+        <div className="app-section-head">
+          <div>
+            <h2 className="app-section-title">Google Calendar</h2>
+            <p className="app-section-subtitle">
+              Connect your own Google Calendar so bookings block busy times and auto-create events.
+            </p>
+          </div>
+          {googleConnected ? (
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                await api.googleCalendarDisconnect();
+                setGoogleConnected(false);
+                setGoogleEmail(null);
+                setGoogleStatus('Google Calendar disconnected.');
+              }}
+            >
+              Disconnect
+            </Button>
+          ) : (
+            <Button
+              onClick={async () => {
+                const res = await api.googleCalendarConnectUrl();
+                window.location.href = res.url;
+              }}
+            >
+              Connect Google Calendar
+            </Button>
+          )}
+        </div>
+        <div className="app-muted" style={{ marginTop: 8, fontWeight: 700 }}>
+          {googleConnected
+            ? `Connected${googleEmail ? ` as ${googleEmail}` : ''}`
+            : 'Not connected. Each host should connect their own Google account.'}
+        </div>
+        {googleStatus ? (
+          <div style={{ marginTop: 10, color: '#1d4ed8', fontWeight: 700 }}>{googleStatus}</div>
+        ) : null}
+      </Card>
 
       <Card>
         <div className="availability-event-card">

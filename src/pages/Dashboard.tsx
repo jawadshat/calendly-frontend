@@ -9,6 +9,7 @@ export function Dashboard() {
   const navigate = useNavigate();
   const [me, setMe] = useState<any>(null);
   const [items, setItems] = useState<any[]>([]);
+  const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -124,64 +125,74 @@ export function Dashboard() {
         </Card>
       ) : (
         <div className="app-grid-2">
-          {items.map((it) => (
-            <Card key={it._id} style={{ padding: 18 }}>
-              <div
-                className="app-event-card"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  alignItems: "start",
-                }}
-              >
-                <div>
-                  <h3 className="app-event-title">{it.title}</h3>
-                  <div className="app-muted" style={{ marginTop: 4 }}>
-                    {it.durationMinutes} min • slug:{" "}
-                    <span style={{ fontFamily: "monospace" }}>{it.slug}</span>
-                  </div>
-                  {username ? (
-                    <div className="app-link" style={{ marginTop: 10 }}>
-                      Generated link:{" "}
-                      <a
-                        href={`/${encodeURIComponent(String(username).trim().toLowerCase())}/${encodeURIComponent(
-                          String(it.slug).trim().toLowerCase(),
-                        )}`}
-                        style={{ fontWeight: 800, color: "inherit" }}
-                      >
-                        /{String(username).trim().toLowerCase()}/
-                        {String(it.slug).trim().toLowerCase()}
-                      </a>
-                    </div>
-                  ) : hasAvailability ? null : (
-                    <div className="app-muted" style={{ marginTop: 10 }}>
-                      Configure this event type availability in Availability
-                      settings.
-                    </div>
-                  )}
-                </div>
+          {items.map((it) => {
+            const publicPath = username
+              ? `/${encodeURIComponent(String(username).trim().toLowerCase())}/${encodeURIComponent(
+                  String(it.slug).trim().toLowerCase(),
+                )}`
+              : "";
+            const publicUrl = publicPath ? `${window.location.origin}${publicPath}` : "";
 
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                >
-                  <Link to={`/dashboard/event-types/${it._id}`}>
-                    <Button variant="secondary">Edit</Button>
-                  </Link>
-                  <Button
-                    variant="secondary"
-                    onClick={async () => {
-                      if (!confirm("Delete this event type?")) return;
-                      await api.deleteEventType(it._id);
-                      await load();
-                    }}
-                  >
-                    Delete
-                  </Button>
+            return (
+              <Card key={it._id} style={{ padding: 18 }}>
+                <div className="app-event-card">
+                  <div className="app-event-main">
+                    <div className="app-event-badge">Event Type</div>
+                    <h3 className="app-event-title">{it.title}</h3>
+                    <div className="app-event-meta">
+                      <span>{it.durationMinutes} min</span>
+                      <span className="app-event-dot">•</span>
+                      <span>
+                        slug: <code>{it.slug}</code>
+                      </span>
+                    </div>
+                    {publicPath ? (
+                      <div className="app-event-link-actions">
+                        <button
+                          type="button"
+                          className="app-link-btn"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(publicUrl);
+                              setCopiedEventId(String(it._id));
+                              window.setTimeout(() => setCopiedEventId((current) => (current === String(it._id) ? null : current)), 1400);
+                            } catch {
+                              setCopiedEventId(null);
+                            }
+                          }}
+                        >
+                          {copiedEventId === String(it._id) ? "Copied" : "Copy link"}
+                        </button>
+                        <a href={publicPath} target="_blank" rel="noreferrer" className="app-link-btn app-link-btn-open">
+                          Open
+                        </a>
+                      </div>
+                    ) : hasAvailability ? null : (
+                      <div className="app-muted app-event-note">
+                        Configure this event type availability in Availability settings.
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="app-event-actions">
+                    <Link to={`/dashboard/event-types/${it._id}`}>
+                      <Button variant="secondary">Edit</Button>
+                    </Link>
+                    <Button
+                      variant="secondary"
+                      onClick={async () => {
+                        if (!confirm("Delete this event type?")) return;
+                        await api.deleteEventType(it._id);
+                        await load();
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

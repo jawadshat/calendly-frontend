@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 
-export function Card(props: { children: ReactNode; style?: React.CSSProperties }) {
+export function Card(props: { children: ReactNode; style?: React.CSSProperties; className?: string }) {
   return (
     <div
-      className="cc-card"
+      className={`cc-card${props.className ? ` ${props.className}` : ''}`}
       style={{
         padding: 16,
         ...props.style,
