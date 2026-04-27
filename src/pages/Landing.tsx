@@ -1,94 +1,125 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import './Landing.css';
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import "./Landing.css";
 
-const logos = ['Notion', 'Stripe', 'Intercom', 'Slack', 'Shopify'];
+const logos = ["Notion", "Stripe", "Intercom", "Slack", "Shopify"];
 const stats = [
-  { target: 120, decimals: 0, prefix: '', suffix: 'K+', label: 'Meetings scheduled' },
-  { target: 32, decimals: 0, prefix: '', suffix: '%', label: 'Fewer no-shows' },
-  { target: 8.5, decimals: 1, prefix: '', suffix: ' hrs', label: 'Saved per week' },
+  {
+    target: 120,
+    decimals: 0,
+    prefix: "",
+    suffix: "K+",
+    label: "Meetings scheduled",
+  },
+  { target: 32, decimals: 0, prefix: "", suffix: "%", label: "Fewer no-shows" },
+  {
+    target: 8.5,
+    decimals: 1,
+    prefix: "",
+    suffix: " hrs",
+    label: "Saved per week",
+  },
 ];
 const testimonials = [
   {
     quote:
-      'Our sales team moved from endless email threads to one clean booking link. The calendar sync is smooth and reliable.',
-    name: 'Sarah Khan',
-    role: 'Revenue Ops Lead',
-    initials: 'SK',
-    company: 'Nexa Growth',
+      "Our sales team moved from endless email threads to one clean booking link. The calendar sync is smooth and reliable.",
+    name: "Sarah Khan",
+    role: "Revenue Ops Lead",
+    initials: "SK",
+    company: "Nexa Growth",
   },
   {
     quote:
-      'Availability controls are exactly what we needed. Buffers and notice windows instantly reduced scheduling chaos.',
-    name: 'Usman Ali',
-    role: 'Founder, Studio Nova',
-    initials: 'UA',
-    company: 'Studio Nova',
+      "Availability controls are exactly what we needed. Buffers and notice windows instantly reduced scheduling chaos.",
+    name: "Usman Ali",
+    role: "Founder, Studio Nova",
+    initials: "UA",
+    company: "Studio Nova",
   },
   {
     quote:
-      'The page looks modern and professional. Clients trust the process and book without needing back-and-forth messages.',
-    name: 'Areeba Noor',
-    role: 'Consultant',
-    initials: 'AN',
-    company: 'Independent',
+      "The page looks modern and professional. Clients trust the process and book without needing back-and-forth messages.",
+    name: "Areeba Noor",
+    role: "Consultant",
+    initials: "AN",
+    company: "Independent",
   },
 ];
 const faqs = [
   {
-    q: 'Can guests book without an account?',
-    a: 'Yes. Anyone can open your event link and book a slot. No sign-up is required for invitees.',
+    q: "Can guests book without an account?",
+    a: "Yes. Anyone can open your event link and book a slot. No sign-up is required for invitees.",
   },
   {
-    q: 'Does it sync with Google Calendar?',
-    a: 'Yes. Host busy times are considered, and invited guests can receive a Google Calendar invite automatically.',
+    q: "Does it sync with Google Calendar?",
+    a: "Yes. Host busy times are considered, and invited guests can receive a Google Calendar invite automatically.",
   },
   {
-    q: 'Can I create multiple event types?',
-    a: 'Absolutely. You can create different durations and meeting types and share each with its own link.',
+    q: "Can I create multiple event types?",
+    a: "Absolutely. You can create different durations and meeting types and share each with its own link.",
   },
 ];
 
 const featureAccordion = [
   {
-    title: 'Professional scheduling experience',
-    subtitle: 'Most loved',
+    title: "Professional scheduling experience",
+    subtitle: "Most loved",
     description:
-      'Turn your availability into a beautiful booking flow that feels modern, branded, and effortless for every invitee.',
+      "Turn your availability into a beautiful booking flow that feels modern, branded, and effortless for every invitee.",
     bullets: [
-      'Personalized links for each event type',
-      'Automatic timezone detection for guests',
-      'Smooth calendar + booking confirmation flow',
+      "Personalized links for each event type",
+      "Automatic timezone detection for guests",
+      "Smooth calendar + booking confirmation flow",
     ],
-    accentClass: 'a1',
+    accentClass: "a1",
   },
   {
-    title: 'Shareable booking links',
-    subtitle: 'Link-first workflow',
-    description: 'One personalized URL for every event type and workflow.',
-    bullets: ['Custom slugs for each meeting type', 'Ready to share on email, bio, or website', 'Branded booking experience'],
-    accentClass: 'a2',
+    title: "Shareable booking links",
+    subtitle: "Link-first workflow",
+    description: "One personalized URL for every event type and workflow.",
+    bullets: [
+      "Custom slugs for each meeting type",
+      "Ready to share on email, bio, or website",
+      "Branded booking experience",
+    ],
+    accentClass: "a2",
   },
   {
-    title: 'Google Calendar sync',
-    subtitle: 'Calendar-safe',
-    description: 'Read busy slots, avoid conflicts, and send guest invites automatically.',
-    bullets: ['Conflict prevention before booking', 'Auto invite creation', 'Reliable schedule consistency'],
-    accentClass: 'a3',
+    title: "Google Calendar sync",
+    subtitle: "Calendar-safe",
+    description:
+      "Read busy slots, avoid conflicts, and send guest invites automatically.",
+    bullets: [
+      "Conflict prevention before booking",
+      "Auto invite creation",
+      "Reliable schedule consistency",
+    ],
+    accentClass: "a3",
   },
   {
-    title: 'Smart availability',
-    subtitle: 'Rule engine',
-    description: 'Define weekly windows, notice time, buffers, and booking limits.',
-    bullets: ['Per-event working windows', 'Min notice and future limits', 'Buffer-aware slot generation'],
-    accentClass: 'a4',
+    title: "Smart availability",
+    subtitle: "Rule engine",
+    description:
+      "Define weekly windows, notice time, buffers, and booking limits.",
+    bullets: [
+      "Per-event working windows",
+      "Min notice and future limits",
+      "Buffer-aware slot generation",
+    ],
+    accentClass: "a4",
   },
   {
-    title: 'Automatic confirmations',
-    subtitle: 'Zero follow-up',
-    description: 'Guests get confirmation details and calendar invites instantly.',
-    bullets: ['Instant host + invitee notifications', 'Reduced no-shows with reminders', 'Professional booking communication'],
-    accentClass: 'a5',
+    title: "Automatic confirmations",
+    subtitle: "Zero follow-up",
+    description:
+      "Guests get confirmation details and calendar invites instantly.",
+    bullets: [
+      "Instant host + invitee notifications",
+      "Reduced no-shows with reminders",
+      "Professional booking communication",
+    ],
+    accentClass: "a5",
   },
 ];
 
@@ -149,14 +180,16 @@ export function Landing() {
   const activeFeature = featureAccordion[activeFeatureIdx];
 
   useEffect(() => {
-    const nodes = Array.from(document.querySelectorAll<HTMLElement>('.lp-reveal'));
+    const nodes = Array.from(
+      document.querySelectorAll<HTMLElement>(".lp-reveal"),
+    );
     if (!nodes.length) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-visible');
+          entry.target.classList.add("is-visible");
           observer.unobserve(entry.target);
         });
       },
@@ -177,8 +210,9 @@ export function Landing() {
             <span className="lp-pill">Calendly style scheduling</span>
             <h1>Easy scheduling ahead</h1>
             <p>
-              Connect with prospects, clients, and teammates in fewer emails. Share one booking link and let people pick the
-              best time instantly.
+              Connect with prospects, clients, and teammates in fewer emails.
+              Share one booking link and let people pick the best time
+              instantly.
             </p>
             <div className="lp-actions">
               <Link to="/register" className="lp-btn lp-btn-primary">
@@ -190,11 +224,13 @@ export function Landing() {
             </div>
             <div className="lp-meta">
               <strong>14-day productivity jump</strong>
-              <span>Thousands of meetings booked with this flow every month.</span>
+              <span>
+                Thousands of meetings booked with this flow every month.
+              </span>
             </div>
           </div>
 
-          <div className="lp-visual lp-enter-right">
+          <div className="lp-visual lp-enter-right" aria-hidden="true">
             <div className="lp-panel lp-float">
               <div className="lp-panel-head">
                 <span className="dot" />
@@ -211,23 +247,36 @@ export function Landing() {
                   <span>Live</span>
                 </div>
                 <div className="lp-calendar">
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, idx) => (
+                  {["M", "T", "W", "T", "F", "S", "S"].map((d, idx) => (
                     <small key={`${d}-${idx}`}>{d}</small>
                   ))}
                   {Array.from({ length: 35 }).map((_, idx) => {
                     const on = [5, 8, 11, 16, 17, 22, 27, 30].includes(idx);
                     return (
-                      <button key={idx} className={on ? 'on' : ''} type="button">
+                      <button
+                        key={idx}
+                        className={on ? "on" : ""}
+                        type="button"
+                        tabIndex={-1}
+                      >
                         {(idx % 30) + 1}
                       </button>
                     );
                   })}
                 </div>
                 <div className="lp-slots">
-                  <button type="button">9:00 AM</button>
-                  <button type="button">10:30 AM</button>
-                  <button type="button">1:00 PM</button>
-                  <button type="button">3:30 PM</button>
+                  <button type="button" tabIndex={-1}>
+                    9:00 AM
+                  </button>
+                  <button type="button" tabIndex={-1}>
+                    10:30 AM
+                  </button>
+                  <button type="button" tabIndex={-1}>
+                    1:00 PM
+                  </button>
+                  <button type="button" tabIndex={-1}>
+                    3:30 PM
+                  </button>
                 </div>
               </div>
             </div>
@@ -251,8 +300,17 @@ export function Landing() {
       <section className="lp-stats lp-reveal">
         <div className="lp-wrap lp-stats-row">
           {stats.map((s, idx) => (
-            <article key={s.label} className="lp-stat-card" style={{ animationDelay: `${120 + idx * 90}ms` }}>
-              <AnimatedStat target={s.target} decimals={s.decimals} prefix={s.prefix} suffix={s.suffix} />
+            <article
+              key={s.label}
+              className="lp-stat-card"
+              style={{ animationDelay: `${120 + idx * 90}ms` }}
+            >
+              <AnimatedStat
+                target={s.target}
+                decimals={s.decimals}
+                prefix={s.prefix}
+                suffix={s.suffix}
+              />
               <p>{s.label}</p>
             </article>
           ))}
@@ -273,7 +331,7 @@ export function Landing() {
                   <button
                     type="button"
                     key={item.title}
-                    className={`lp-feature-item${active ? ' is-active' : ''}`}
+                    className={`lp-feature-item${active ? " is-active" : ""}`}
                     onClick={() => setActiveFeatureIdx(idx)}
                   >
                     <span className="lp-feature-item-title">{item.title}</span>
@@ -283,7 +341,10 @@ export function Landing() {
               })}
             </div>
 
-            <div className={`lp-feature-stage ${activeFeature.accentClass}`} key={activeFeature.title}>
+            <div
+              className={`lp-feature-stage ${activeFeature.accentClass}`}
+              key={activeFeature.title}
+            >
               <div className="lp-feature-bg-motion" aria-hidden="true">
                 <span className="blob b1" />
                 <span className="blob b2" />
@@ -292,7 +353,9 @@ export function Landing() {
               </div>
               <div className="lp-feature-stage-glow" aria-hidden="true" />
               <article className="lp-feature-stage-content">
-                <span className="lp-feature-chip">{activeFeature.subtitle}</span>
+                <span className="lp-feature-chip">
+                  {activeFeature.subtitle}
+                </span>
                 <h3>{activeFeature.title}</h3>
                 <p>{activeFeature.description}</p>
                 <ul>
@@ -326,8 +389,8 @@ export function Landing() {
             <span className="lp-showcase-kicker">Guest-first design</span>
             <h2>Designed to impress every invitee</h2>
             <p>
-              Deliver a premium booking experience with elegant pages, clear time selection, and real-time availability that
-              updates instantly.
+              Deliver a premium booking experience with elegant pages, clear
+              time selection, and real-time availability that updates instantly.
             </p>
             <ul>
               <li>Beautiful scheduling pages with clean typography</li>
@@ -352,9 +415,15 @@ export function Landing() {
                 <h4>Product Demo Call</h4>
                 <p>Choose a time to meet with our team.</p>
                 <div className="time-row">
-                  <button type="button">11:00 AM</button>
-                  <button type="button">12:30 PM</button>
-                  <button type="button">3:00 PM</button>
+                  <button type="button" tabIndex={-1}>
+                    11:00 AM
+                  </button>
+                  <button type="button" tabIndex={-1}>
+                    12:30 PM
+                  </button>
+                  <button type="button" tabIndex={-1}>
+                    3:00 PM
+                  </button>
                 </div>
               </div>
               <div className="lp-layer-card lp-layer-top">
@@ -396,7 +465,9 @@ export function Landing() {
               <span className="lp-step-number">3</span>
               <div className="lp-step-icon">✅</div>
               <h4>Get booked</h4>
-              <p>Share link, receive booking, and sync everything to calendar.</p>
+              <p>
+                Share link, receive booking, and sync everything to calendar.
+              </p>
             </div>
           </div>
         </div>
@@ -440,7 +511,9 @@ export function Landing() {
               <details key={item.q} className="lp-faq-item">
                 <summary>
                   <span className="lp-faq-qwrap">
-                    <span className="lp-faq-index">{String(idx + 1).padStart(2, '0')}</span>
+                    <span className="lp-faq-index">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
                     <span>{item.q}</span>
                   </span>
                   <span className="lp-faq-plus" aria-hidden="true">

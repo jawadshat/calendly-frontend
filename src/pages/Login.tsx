@@ -13,6 +13,20 @@ export function Login() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  async function submit() {
+    try {
+      setLoading(true);
+      setError(null);
+      const { token } = await api.login({ email, password });
+      setToken(token);
+      navigate('/dashboard');
+    } catch (e: any) {
+      setError(formatApiError(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="auth-wrap">
       <div className="auth-hero">
@@ -23,19 +37,26 @@ export function Login() {
         <h2 style={{ margin: 0 }}>Log in</h2>
         <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>Access your scheduling dashboard.</div>
 
-        <div style={{ marginTop: 16 }}>
-          <Label>Email</Label>
-          <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <Label>Password</Label>
-          <Input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            type="password"
-          />
-        </div>
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            await submit();
+          }}
+        >
+          <div style={{ marginTop: 16 }}>
+            <Label htmlFor="login-email">Email</Label>
+            <Input id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <Label htmlFor="login-password">Password</Label>
+            <Input
+              id="login-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              type="password"
+            />
+          </div>
 
         {error ? (
           <div style={{ marginTop: 12 }}>
@@ -43,29 +64,15 @@ export function Login() {
           </div>
         ) : null}
 
-        <div className="auth-footer">
-          <Link to="/register" className="auth-link">
-            Create account
-          </Link>
-          <Button
-            disabled={loading}
-            onClick={async () => {
-              try {
-                setLoading(true);
-                setError(null);
-                const { token } = await api.login({ email, password });
-                setToken(token);
-                navigate('/dashboard');
-              } catch (e: any) {
-                setError(formatApiError(e));
-              } finally {
-                setLoading(false);
-              }
-            }}
-          >
-            {loading ? 'Logging in…' : 'Log in'}
-          </Button>
-        </div>
+          <div className="auth-footer">
+            <Link to="/register" className="auth-link">
+              Create account
+            </Link>
+            <Button disabled={loading} type="submit">
+              {loading ? 'Logging in…' : 'Log in'}
+            </Button>
+          </div>
+        </form>
       </Card>
     </div>
   );

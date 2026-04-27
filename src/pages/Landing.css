@@ -96,6 +96,11 @@
   transform: translateY(-1px);
 }
 
+.lp-btn:focus-visible {
+  outline: 3px solid rgba(0, 107, 255, 0.35);
+  outline-offset: 2px;
+}
+
 .lp-btn-primary {
   background: #006bff;
   color: #fff;
@@ -319,6 +324,11 @@
   border-color: rgba(0, 107, 255, 0.5);
   background: linear-gradient(165deg, #eff6ff, #dbeafe);
   box-shadow: 0 14px 24px rgba(0, 83, 199, 0.15);
+}
+
+.lp-feature-item:focus-visible {
+  outline: 3px solid rgba(0, 107, 255, 0.35);
+  outline-offset: 2px;
 }
 
 .lp-feature-item-title {
@@ -969,6 +979,14 @@
   transform: translateY(-2px);
   border-color: rgba(0, 107, 255, 0.4);
   box-shadow: 0 10px 16px rgba(0, 83, 199, 0.14);
+}
+
+.time-row button:focus-visible,
+.lp-calendar button:focus-visible,
+.lp-slots button:focus-visible,
+.lp-faq-item summary:focus-visible {
+  outline: 3px solid rgba(0, 107, 255, 0.35);
+  outline-offset: 2px;
 }
 
 .lp-testimonials {

@@ -81,12 +81,23 @@ export function Bookings() {
       ) : (
         <div className="bookings-list">
           {items.map((b) => {
-          const start = DateTime.fromISO(new Date(b.startUtc).toISOString(), { zone: 'utc' }).toLocal();
+          const start = DateTime.fromISO(String(b.startUtc), { zone: 'utc' });
+          if (!start.isValid) {
+            return (
+              <Card key={b._id}>
+                <div className="booking-row">
+                  <div style={{ fontWeight: 800, color: '#b91c1c' }}>Invalid booking date</div>
+                  <span className="booking-pill">Confirmed</span>
+                </div>
+              </Card>
+            );
+          }
+          const localStart = start.toLocal();
           return (
             <Card key={b._id}>
               <div className="booking-row">
                 <div>
-                  <div style={{ fontWeight: 950, fontSize: 16 }}>{start.toFormat('cccc, LLL d • h:mm a')}</div>
+                  <div style={{ fontWeight: 950, fontSize: 16 }}>{localStart.toFormat('cccc, LLL d • h:mm a')}</div>
                   <div className="cc-muted" style={{ fontSize: 13, marginTop: 6 }}>
                     Invitee: {b.inviteeName} ({b.inviteeEmail})
                   </div>

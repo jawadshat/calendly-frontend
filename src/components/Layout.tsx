@@ -8,6 +8,7 @@ export function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const authed = Boolean(getToken());
+  const isDashboardRoute = location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/');
   const year = new Date().getFullYear();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -104,7 +105,7 @@ export function Layout() {
         ) : null}
       </header>
 
-      {authed ? (
+      {authed && isDashboardRoute ? (
         <main className={`app-main app-main-dashboard${sidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
           <aside className={`app-sidebar${sidebarCollapsed ? ' is-collapsed' : ''}${mobileMenuOpen ? ' is-mobile-open' : ''}`}>
             <div className="app-sidebar-head">

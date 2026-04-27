@@ -44,6 +44,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   // Successful response but not JSON (common when hitting Vite dev server => index.html)
+  if (res.status === 204 || !text) {
+    return undefined as T;
+  }
+
   if (!isJson) {
     const snippet = text ? text.slice(0, 160) : '';
     throw { error: `Expected JSON from ${url} but got ${contentType || 'unknown content-type'}${snippet ? `: ${snippet}` : ''}` };

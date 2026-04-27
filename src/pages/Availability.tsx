@@ -146,10 +146,15 @@ export function Availability() {
             <Button
               variant="secondary"
               onClick={async () => {
-                await api.googleCalendarDisconnect();
-                setGoogleConnected(false);
-                setGoogleEmail(null);
-                setGoogleStatus('Google Calendar disconnected.');
+                try {
+                  setError(null);
+                  await api.googleCalendarDisconnect();
+                  setGoogleConnected(false);
+                  setGoogleEmail(null);
+                  setGoogleStatus('Google Calendar disconnected.');
+                } catch (e: any) {
+                  setError(formatApiError(e));
+                }
               }}
             >
               Disconnect
@@ -157,8 +162,13 @@ export function Availability() {
           ) : (
             <Button
               onClick={async () => {
-                const res = await api.googleCalendarConnectUrl();
-                window.location.href = res.url;
+                try {
+                  setError(null);
+                  const res = await api.googleCalendarConnectUrl();
+                  window.location.href = res.url;
+                } catch (e: any) {
+                  setError(formatApiError(e));
+                }
               }}
             >
               Connect Google Calendar

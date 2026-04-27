@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { getToken } from "../lib/auth";
+import { formatApiError } from "../lib/formatError";
 import { Button, Card } from "../components/ui";
 import "./AppPages.css";
 
@@ -182,8 +183,13 @@ export function Dashboard() {
                       variant="secondary"
                       onClick={async () => {
                         if (!confirm("Delete this event type?")) return;
-                        await api.deleteEventType(it._id);
-                        await load();
+                        try {
+                          setError(null);
+                          await api.deleteEventType(it._id);
+                          await load();
+                        } catch (e: any) {
+                          setError(formatApiError(e));
+                        }
                       }}
                     >
                       Delete

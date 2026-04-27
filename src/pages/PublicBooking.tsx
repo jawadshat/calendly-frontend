@@ -130,6 +130,45 @@ export function PublicBooking() {
     );
   }
 
+  async function submitBooking() {
+    if (!safeUsername || !safeEventSlug || !selected) return;
+
+    if (inviteeName.trim().length < 2) {
+      setBookingError("Name must be at least 2 characters");
+      return;
+    }
+    const normalizedEmail = inviteeEmail.trim();
+    if (!normalizedEmail) {
+      setBookingError("Email is required");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(normalizedEmail)) {
+      setBookingError("Invalid email address");
+      return;
+    }
+
+    try {
+      setBookingLoading(true);
+      setBookingError(null);
+      const resp = await api.publicBook(
+        safeUsername,
+        safeEventSlug,
+        {
+          inviteeName: inviteeName.trim(),
+          inviteeEmail: normalizedEmail,
+          startUtcISO: selected.startUtcISO,
+          endUtcISO: selected.endUtcISO,
+          inviteeTimezone: inviteeTz,
+        },
+      );
+      setBooking(resp.booking);
+    } catch (e: any) {
+      setBookingError(e?.error ?? "Booking failed");
+    } finally {
+      setBookingLoading(false);
+    }
+  }
+
   return (
     <div className="pb-wrap">
       <div className="pb-hero">
@@ -236,20 +275,28 @@ export function PublicBooking() {
         )}
 
         {selected ? (
-          <div className="pb-form">
+          <form
+            className="pb-form"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await submitBooking();
+            }}
+          >
             <div className="pb-form-title">Enter your details</div>
             <div className="pb-form-grid">
               <div>
-                <Label>Name</Label>
+                <Label htmlFor="invitee-name">Name</Label>
                 <Input
+                  id="invitee-name"
                   value={inviteeName}
                   onChange={(e) => setInviteeName(e.target.value)}
                   placeholder="Your name"
                 />
               </div>
               <div>
-                <Label>Email</Label>
+                <Label htmlFor="invitee-email">Email</Label>
                 <Input
+                  id="invitee-email"
                   value={inviteeEmail}
                   onChange={(e) => setInviteeEmail(e.target.value)}
                   placeholder="you@email.com"
@@ -264,53 +311,11 @@ export function PublicBooking() {
             ) : null}
 
             <div className="pb-form-actions">
-              <Button
-                disabled={bookingLoading}
-                onClick={async () => {
-                  if (!safeUsername || !safeEventSlug || !selected) return;
-
-                  // email and name validation
-                  if (inviteeName.trim().length < 2) {
-                    setBookingError("Name must be at least 2 characters");
-                    return;
-                  }
-                  if (inviteeEmail.trim().length < 8) {
-                    setBookingError(
-                      "Email must be at least 8 characters and in correct format",
-                    );
-                    return;
-                  }
-                  if (!/\S+@\S+\.\S+/.test(inviteeEmail)) {
-                    setBookingError("Invalid email address");
-                    return;
-                  }
-
-                  try {
-                    setBookingLoading(true);
-                    setBookingError(null);
-                    const resp = await api.publicBook(
-                      safeUsername,
-                      safeEventSlug,
-                      {
-                        inviteeName,
-                        inviteeEmail,
-                        startUtcISO: selected.startUtcISO,
-                        endUtcISO: selected.endUtcISO,
-                        inviteeTimezone: inviteeTz,
-                      },
-                    );
-                    setBooking(resp.booking);
-                  } catch (e: any) {
-                    setBookingError(e?.error ?? "Booking failed");
-                  } finally {
-                    setBookingLoading(false);
-                  }
-                }}
-              >
+              <Button disabled={bookingLoading} type="submit">
                 {bookingLoading ? "Booking…" : "Schedule event"}
               </Button>
             </div>
-          </div>
+          </form>
         ) : null}
       </Card>
       </div>

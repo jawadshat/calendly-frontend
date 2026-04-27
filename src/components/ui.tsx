@@ -14,8 +14,12 @@ export function Card(props: { children: ReactNode; style?: React.CSSProperties; 
   );
 }
 
-export function Label(props: { children: ReactNode }) {
-  return <div style={{ fontSize: 12, fontWeight: 900, color: '#334155', marginBottom: 6 }}>{props.children}</div>;
+export function Label(props: { children: ReactNode; htmlFor?: string }) {
+  return (
+    <label htmlFor={props.htmlFor} style={{ fontSize: 12, fontWeight: 900, color: '#334155', marginBottom: 6, display: 'block' }}>
+      {props.children}
+    </label>
+  );
 }
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
@@ -60,6 +64,6 @@ export function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement> & { 
 }
 
 export function ErrorText(props: { children: ReactNode }) {
-  return <div className="cc-error">{props.children}</div>;
+  return <div className="cc-error" role="alert" aria-live="polite">{props.children}</div>;
 }
 
