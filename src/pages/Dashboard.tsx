@@ -125,7 +125,7 @@ export function Dashboard() {
           </div>
         </Card>
       ) : (
-        <div className="app-grid-2">
+        <div className="app-grid-2 app-grid-event-types">
           {items.map((it) => {
             const publicPath = username
               ? `/${encodeURIComponent(String(username).trim().toLowerCase())}/${encodeURIComponent(

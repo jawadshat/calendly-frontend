@@ -65,6 +65,7 @@ const featureAccordion = [
   {
     title: "Professional scheduling experience",
     subtitle: "Most loved",
+    logo: "✦",
     description:
       "Turn your availability into a beautiful booking flow that feels modern, branded, and effortless for every invitee.",
     bullets: [
@@ -72,22 +73,38 @@ const featureAccordion = [
       "Automatic timezone detection for guests",
       "Smooth calendar + booking confirmation flow",
     ],
+    mediaStats: [
+      { label: "Next slot", value: "10:30 AM" },
+      { label: "Timezone", value: "PKT" },
+      { label: "Status", value: "Available" },
+      { label: "Mode", value: "Auto confirm" },
+    ],
+    mediaHighlights: ["Guest-ready page", "Smart slot engine"],
     accentClass: "a1",
   },
   {
     title: "Shareable booking links",
     subtitle: "Link-first workflow",
+    logo: "↗",
     description: "One personalized URL for every event type and workflow.",
     bullets: [
       "Custom slugs for each meeting type",
       "Ready to share on email, bio, or website",
       "Branded booking experience",
     ],
+    mediaStats: [
+      { label: "URL", value: "/jawad/demo-call" },
+      { label: "Channels", value: "Email + Bio" },
+      { label: "Clicks", value: "1.8K/mo" },
+      { label: "Share", value: "One tap" },
+    ],
+    mediaHighlights: ["Link analytics", "Branded redirects"],
     accentClass: "a2",
   },
   {
     title: "Google Calendar sync",
     subtitle: "Calendar-safe",
+    logo: "◎",
     description:
       "Read busy slots, avoid conflicts, and send guest invites automatically.",
     bullets: [
@@ -95,11 +112,19 @@ const featureAccordion = [
       "Auto invite creation",
       "Reliable schedule consistency",
     ],
+    mediaStats: [
+      { label: "Provider", value: "Google + Outlook" },
+      { label: "Conflicts", value: "Blocked live" },
+      { label: "Sync", value: "Realtime" },
+      { label: "Invites", value: "Auto sent" },
+    ],
+    mediaHighlights: ["Calendar-safe flow", "Live busy checks"],
     accentClass: "a3",
   },
   {
     title: "Smart availability",
     subtitle: "Rule engine",
+    logo: "◆",
     description:
       "Define weekly windows, notice time, buffers, and booking limits.",
     bullets: [
@@ -107,11 +132,19 @@ const featureAccordion = [
       "Min notice and future limits",
       "Buffer-aware slot generation",
     ],
+    mediaStats: [
+      { label: "Work hours", value: "9 AM - 6 PM" },
+      { label: "Buffer", value: "15 mins" },
+      { label: "Min notice", value: "6 hours" },
+      { label: "Max range", value: "45 days" },
+    ],
+    mediaHighlights: ["Rule-based windows", "Adaptive slots"],
     accentClass: "a4",
   },
   {
     title: "Automatic confirmations",
     subtitle: "Zero follow-up",
+    logo: "❤",
     description:
       "Guests get confirmation details and calendar invites instantly.",
     bullets: [
@@ -119,6 +152,13 @@ const featureAccordion = [
       "Reduced no-shows with reminders",
       "Professional booking communication",
     ],
+    mediaStats: [
+      { label: "Email", value: "Instant send" },
+      { label: "Reminder", value: "24h + 1h" },
+      { label: "No-show drop", value: "-32%" },
+      { label: "Template", value: "Branded" },
+    ],
+    mediaHighlights: ["Follow-up automation", "Premium messaging"],
     accentClass: "a5",
   },
 ];
@@ -178,6 +218,14 @@ function AnimatedStat(props: {
 export function Landing() {
   const [activeFeatureIdx, setActiveFeatureIdx] = useState(0);
   const activeFeature = featureAccordion[activeFeatureIdx];
+  const featureSlideMs = 7600;
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveFeatureIdx((prev) => (prev + 1) % featureAccordion.length);
+    }, featureSlideMs);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const nodes = Array.from(
@@ -207,12 +255,12 @@ export function Landing() {
         <div className="lp-orb lp-orb-b" aria-hidden="true" />
         <div className="lp-wrap">
           <div className="lp-copy lp-enter-up">
-            <span className="lp-pill">Calendly style scheduling</span>
-            <h1>Easy scheduling ahead</h1>
+            <span className="lp-pill">Sheduling </span>
+            <h1>Easy Scheduling ahead</h1>
             <p>
-              Connect with prospects, clients, and teammates in fewer emails.
-              Share one booking link and let people pick the best time
-              instantly.
+              Turn every meeting flow into a polished experience. Share one
+              smart booking link and let prospects, clients, and teammates pick
+              the best time instantly.
             </p>
             <div className="lp-actions">
               <Link to="/register" className="lp-btn lp-btn-primary">
@@ -328,15 +376,77 @@ export function Landing() {
               {featureAccordion.map((item, idx) => {
                 const active = idx === activeFeatureIdx;
                 return (
-                  <button
-                    type="button"
-                    key={item.title}
-                    className={`lp-feature-item${active ? " is-active" : ""}`}
-                    onClick={() => setActiveFeatureIdx(idx)}
-                  >
-                    <span className="lp-feature-item-title">{item.title}</span>
-                    <span className="lp-feature-item-sub">{item.subtitle}</span>
-                  </button>
+                  <div key={item.title} className="lp-feature-item-wrap">
+                    <button
+                      type="button"
+                      className={`lp-feature-item lp-theme-${item.accentClass}${active ? " is-active" : ""}`}
+                      onClick={() => setActiveFeatureIdx(idx)}
+                    >
+                      <span className="lp-feature-item-top">
+                        <span className="lp-feature-item-logo" aria-hidden="true">
+                          {item.logo}
+                        </span>
+                        {active ? (
+                          <span className="lp-feature-item-sub">{item.subtitle}</span>
+                        ) : null}
+                      </span>
+                      <span className="lp-feature-item-title">{item.title}</span>
+                      {active ? (
+                        <span className="lp-feature-item-desc">{item.description}</span>
+                      ) : null}
+                      {active ? (
+                        <span
+                          className="lp-feature-progress"
+                          style={{ animationDuration: `${featureSlideMs}ms` }}
+                          aria-hidden="true"
+                        />
+                      ) : null}
+                    </button>
+                    {active ? (
+                      <div className="lp-mobile-stage" aria-hidden="true">
+                        <div className={`lp-media-browser lp-media-${item.accentClass}`}>
+                          <div className="lp-media-browser-head">
+                            <span />
+                            <span />
+                            <span />
+                            <small>calendlyclone.app/{item.accentClass}</small>
+                          </div>
+                          <div className="lp-media-browser-body">
+                            <div className="lp-media-hero">
+                              <div className="lp-media-hero-top">
+                                <span>{item.logo}</span>
+                                <strong>{item.title}</strong>
+                              </div>
+                              <div className="lp-media-hero-grid">
+                                <div>
+                                  <small>Mode</small>
+                                  <strong>{item.subtitle}</strong>
+                                </div>
+                                <div>
+                                  <small>Status</small>
+                                  <strong>Live</strong>
+                                </div>
+                                <div>
+                                  <small>Flow</small>
+                                  <strong>Smart booking</strong>
+                                </div>
+                                <div>
+                                  <small>Result</small>
+                                  <strong>Less friction</strong>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="lp-media-card">
+                              <strong>{item.bullets[0]}</strong>
+                            </div>
+                            <div className="lp-media-card">
+                              <strong>{item.bullets[1]}</strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
                 );
               })}
             </div>
@@ -349,33 +459,43 @@ export function Landing() {
                 <span className="blob b1" />
                 <span className="blob b2" />
                 <span className="blob b3" />
+                <span className="sq sq1" />
+                <span className="sq sq2" />
                 <span className="grid" />
               </div>
               <div className="lp-feature-stage-glow" aria-hidden="true" />
-              <article className="lp-feature-stage-content">
-                <span className="lp-feature-chip">
-                  {activeFeature.subtitle}
-                </span>
-                <h3>{activeFeature.title}</h3>
-                <p>{activeFeature.description}</p>
-                <ul>
-                  {activeFeature.bullets.map((bullet) => (
-                    <li key={bullet}>{bullet}</li>
-                  ))}
-                </ul>
-              </article>
-
-              <div className="lp-feature-stage-visual" aria-hidden="true">
-                <div className="lp-feature-pulse" />
-                <div className="lp-feature-bars">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className="lp-feature-badges">
-                  <span>Auto</span>
-                  <span>Live</span>
-                  <span>Smart</span>
+              <div className="lp-feature-stage-media" aria-hidden="true">
+                <div
+                  className={`lp-media-browser lp-media-${activeFeature.accentClass}`}
+                >
+                  <div className="lp-media-browser-head">
+                    <span />
+                    <span />
+                    <span />
+                    <small>calendlyclone.app/{activeFeature.accentClass}</small>
+                  </div>
+                  <div className="lp-media-browser-body">
+                    <div className="lp-media-hero">
+                      <div className="lp-media-hero-top">
+                        <span>{activeFeature.logo}</span>
+                        <strong>{activeFeature.title}</strong>
+                      </div>
+                      <div className="lp-media-hero-grid">
+                        {activeFeature.mediaStats.map((item) => (
+                          <div key={`${activeFeature.title}-${item.label}`}>
+                            <small>{item.label}</small>
+                            <strong>{item.value}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="lp-media-card">
+                      <strong>{activeFeature.mediaHighlights[0]}</strong>
+                    </div>
+                    <div className="lp-media-card">
+                      <strong>{activeFeature.mediaHighlights[1]}</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -451,15 +571,15 @@ export function Landing() {
           <div className="lp-steps-row lp-steps-modern">
             <div className="lp-step lp-step-modern">
               <span className="lp-step-number">1</span>
-              <div className="lp-step-icon">⚙</div>
-              <h4>Set availability</h4>
-              <p>Configure your timezone, work hours, and booking rules.</p>
-            </div>
-            <div className="lp-step lp-step-modern">
-              <span className="lp-step-number">2</span>
               <div className="lp-step-icon">🔗</div>
               <h4>Create event type</h4>
               <p>Add meeting durations and details for each use case.</p>
+            </div>
+            <div className="lp-step lp-step-modern">
+              <span className="lp-step-number">2</span>
+              <div className="lp-step-icon">⚙</div>
+              <h4>Set availability</h4>
+              <p>Configure your timezone, work hours, and booking rules.</p>
             </div>
             <div className="lp-step lp-step-modern">
               <span className="lp-step-number">3</span>

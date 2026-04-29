@@ -64,6 +64,12 @@ export function Layout() {
           <div className="app-top-actions">
             {!authed ? (
               <nav className="app-nav">
+                <Link to="/product" className="app-nav-link">
+                  Product
+                </Link>
+                <Link to="/we-solve" className="app-nav-link">
+                  We solve
+                </Link>
                 <Link to="/login" className="app-nav-link">
                   Log in
                 </Link>
@@ -95,6 +101,12 @@ export function Layout() {
         </div>
         {!authed ? (
           <div className={`app-mobile-nav${mobileMenuOpen ? ' is-open' : ''}`}>
+            <Link to="/product" className="app-nav-link">
+              Product
+            </Link>
+            <Link to="/we-solve" className="app-nav-link">
+              We solve
+            </Link>
             <Link to="/login" className="app-nav-link">
               Log in
             </Link>

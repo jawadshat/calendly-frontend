@@ -11,6 +11,8 @@ import { Bookings } from "./pages/Bookings";
 import { PublicBooking } from "./pages/PublicBooking";
 import { Analytics } from "./pages/Analytics";
 import { ProfileSettings } from "./pages/ProfileSettings";
+import { WeSolve } from "./pages/WeSolve";
+import { Product } from "./pages/Product";
 
 function NormalizePath() {
   const location = useLocation();
@@ -67,6 +69,8 @@ export default function App() {
               </GuestOnly>
             }
           />
+          <Route path="/we-solve" element={<WeSolve />} />
+          <Route path="/product" element={<Product />} />
           <Route
             path="/dashboard"
             element={

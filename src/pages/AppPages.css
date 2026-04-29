@@ -874,8 +874,15 @@
 
 @media (max-width: 900px) {
   .app-grid-2,
-  .app-grid-4,
   .availability-config-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-grid-event-types {
     grid-template-columns: 1fr;
   }
 
@@ -982,6 +989,6 @@
   }
 
   .profile-settings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
