@@ -1,0 +1,5 @@
+@media (max-width: 900px) {
+  .app-grid-event-types {
+    grid-template-columns: 1fr;
+  }
+}

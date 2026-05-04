@@ -1,0 +1,252 @@
+.pb-wrap {
+  display: grid;
+  gap: 16px;
+}
+
+.pb-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border-radius: 22px;
+  color: #fff;
+  background:
+    radial-gradient(620px 220px at 0% 0%, rgba(125, 211, 252, 0.3), transparent 62%),
+    radial-gradient(680px 230px at 100% 120%, rgba(147, 197, 253, 0.24), transparent 66%),
+    linear-gradient(135deg, #0f172a, #0b3b87 45%, #0f4c9c);
+  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.24);
+}
+
+.pb-hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 3.8vw, 44px);
+  letter-spacing: -0.02em;
+}
+
+.pb-hero p {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 680px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.pb-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(380px, 1.1fr);
+  gap: 16px;
+}
+
+.pb-title {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pb-sub {
+  color: #64748b;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.pb-sub-spaced {
+  margin-top: 14px;
+}
+
+.pb-label {
+  margin-top: 20px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.pb-muted-line {
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.pb-calendar-wrap {
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 8px;
+  background: linear-gradient(170deg, #fff, #f8fbff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.react-calendar {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 8px 6px;
+  background: transparent;
+  font-family: inherit;
+}
+
+.react-calendar__navigation button {
+  border-radius: 10px;
+  font-weight: 800;
+  color: #0f172a;
+  min-height: 36px;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.react-calendar__tile {
+  border-radius: 10px;
+  font-weight: 800;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.08);
+}
+
+.pb-google-day-available {
+  border: 1px solid rgba(0, 107, 255, 0.38);
+  background: rgba(0, 107, 255, 0.11);
+}
+
+.pb-google-day-selected {
+  border: 1px solid var(--primary) !important;
+  background: rgba(0, 107, 255, 0.24) !important;
+  color: #0f172a !important;
+}
+
+.pb-empty-state {
+  color: #64748b;
+  font-weight: 800;
+  border: 1px dashed rgba(100, 116, 139, 0.35);
+  border-radius: 14px;
+  background: #fbfdff;
+  padding: 12px 14px;
+}
+
+.pb-times-title {
+  font-weight: 900;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.pb-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.pb-time-btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: linear-gradient(165deg, #fff, #f8fbff);
+  color: #0f172a;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+
+.pb-time-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 107, 255, 0.35);
+  box-shadow: 0 8px 14px rgba(15, 23, 42, 0.08);
+}
+
+.pb-time-btn.active {
+  background: linear-gradient(160deg, #0f172a, #1e3a8a);
+  color: #fff;
+  border-color: #1e3a8a;
+  box-shadow: 0 10px 18px rgba(30, 58, 138, 0.24);
+}
+
+.pb-form {
+  margin-top: 18px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 18px;
+}
+
+.pb-form-title {
+  font-weight: 900;
+  font-size: 17px;
+  color: #0f172a;
+}
+
+.pb-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.pb-form-error {
+  margin-top: 12px;
+}
+
+.pb-form-actions {
+  display: flex;
+  justify-content: end;
+  margin-top: 14px;
+}
+
+.pb-confirm {
+  max-width: 760px;
+  margin: 26px auto;
+}
+
+.pb-confirm-title {
+  font-weight: 900;
+  font-size: 20px;
+  color: #0f172a;
+}
+
+.pb-confirm-sub {
+  color: #64748b;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.pb-confirm-time {
+  margin-top: 14px;
+  font-weight: 900;
+  color: #1e3a8a;
+}
+
+.pb-confirm-actions {
+  margin-top: 20px;
+}
+
+@media (max-width: 980px) {
+  .pb-grid,
+  .pb-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .pb-hero {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .pb-title {
+    font-size: 21px;
+  }
+
+  .pb-time-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .pb-confirm {
+    margin: 16px auto;
+  }
+}

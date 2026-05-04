@@ -1,0 +1,32 @@
+.bookings-list {
+  display: grid;
+  gap: 10px;
+}
+
+.booking-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.booking-row .cc-muted {
+  overflow-wrap: anywhere;
+}
+
+.booking-pill {
+  background: rgba(22, 163, 74, 0.1);
+  color: #15803d;
+  border: 1px solid rgba(22, 163, 74, 0.28);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 720px) {
+  .booking-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
