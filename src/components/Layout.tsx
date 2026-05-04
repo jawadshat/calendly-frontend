@@ -100,7 +100,7 @@ export function Layout() {
             </span>
             <span className="app-brand-text">
               <span className="app-brand-name">
-                <span className="app-brand-accent">C</span>alendlyClone
+                <span className="app-brand-accent">Y</span>oursScheduling
               </span>
               <span className="app-brand-tagline">
                 {authed && isDashboardRoute
@@ -424,7 +424,7 @@ export function Layout() {
           <div className="app-footer-grid">
             <div className="app-footer-brand-col">
               <div className="app-footer-brand">
-                <span className="app-brand-accent">C</span>alendlyClone
+                <span className="app-brand-accent">Y</span>oursSheduling
               </div>
               <p className="app-footer-lead">
                 Smarter scheduling for modern teams. Share links, protect your
@@ -532,10 +532,10 @@ export function Layout() {
           </div>
           <div className="app-footer-bottom">
             <span className="app-footer-meta">
-              © {year} CalendlyClone. Crafted with care.
+              © {year} YoursSheduling. Crafted with care.
             </span>
             <span className="app-footer-legal">
-              Privacy · Terms · Demo project
+              Privacy · Terms · Sheduling project
             </span>
           </div>
         </div>
