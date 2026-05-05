@@ -9,6 +9,7 @@ import './AppShared.css';
 import './Availability.css';
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const MIN_WINDOW_MINUTES = 30;
 
 function hhmmToMinute(s: string) {
   const [hh, mm] = s.split(':').map((x) => Number(x));
@@ -107,6 +108,39 @@ export function Availability() {
     () => eventTypes.find((it) => String(it._id) === selectedEventTypeId),
     [eventTypes, selectedEventTypeId],
   );
+  const timezoneOptions = useMemo(() => {
+    const fallback = [
+      "UTC",
+      "Asia/Karachi",
+      "Asia/Dubai",
+      "Asia/Kolkata",
+      "Asia/Singapore",
+      "Asia/Tokyo",
+      "Europe/London",
+      "Europe/Berlin",
+      "Europe/Paris",
+      "America/New_York",
+      "America/Chicago",
+      "America/Denver",
+      "America/Los_Angeles",
+      "America/Toronto",
+      "Australia/Sydney",
+    ];
+    return Array.from(new Set([timezone, ...fallback])).sort();
+  }, [timezone]);
+  const timeOptions = useMemo(() => {
+    const eventDuration = Number(selectedEventType?.durationMinutes ?? 60);
+    const timeStepMinutes = Math.max(
+      60,
+      Number.isFinite(eventDuration) && eventDuration > 0 ? eventDuration : 60,
+    );
+    const options: { value: string; label: string }[] = [];
+    for (let minutes = 0; minutes < 24 * 60; minutes += timeStepMinutes) {
+      const value = minuteToHHMM(minutes);
+      options.push({ value, label: value });
+    }
+    return options;
+  }, [selectedEventType?.durationMinutes]);
 
   if (loading) return <div style={{ color: 'var(--muted)', fontWeight: 700 }}>Loading…</div>;
 
@@ -232,54 +266,6 @@ export function Availability() {
             </div>
           ) : null}
         </div>
-
-        <div className="availability-config-grid">
-          <div>
-            <Label>Timezone (IANA)</Label>
-            <Input value={timezone} onChange={(e) => setTimezone(e.target.value)} placeholder="Asia/Karachi" />
-          </div>
-          <div className="availability-config-grid">
-            <div>
-              <Label>Min notice (minutes)</Label>
-              <Input
-                type="number"
-                min={0}
-                value={String(minNoticeMinutes)}
-                onChange={(e) => setMinNoticeMinutes(Number(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label>Max days in future</Label>
-              <Input
-                type="number"
-                min={1}
-                value={String(maxDaysInFuture)}
-                onChange={(e) => setMaxDaysInFuture(Number(e.target.value))}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="availability-config-grid" style={{ marginTop: 12 }}>
-          <div>
-            <Label>Buffer before (minutes)</Label>
-            <Input
-              type="number"
-              min={0}
-              value={String(bufferBeforeMinutes)}
-              onChange={(e) => setBufferBeforeMinutes(Number(e.target.value))}
-            />
-          </div>
-          <div>
-            <Label>Buffer after (minutes)</Label>
-            <Input
-              type="number"
-              min={0}
-              value={String(bufferAfterMinutes)}
-              onChange={(e) => setBufferAfterMinutes(Number(e.target.value))}
-            />
-          </div>
-        </div>
       </Card>
 
       <Card>
@@ -287,62 +273,201 @@ export function Availability() {
         <div className="app-section-subtitle">Enable the days you want to accept meetings.</div>
         <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
           {DOW.map((label, dayOfWeek) => {
-            const windows = weeklyByDay.get(dayOfWeek) ?? [];
-            const win = windows[0]; // MVP: one window per day
-            const enabled = Boolean(win);
-            const start = enabled ? minuteToHHMM(win.startMinute) : '09:00';
-            const end = enabled ? minuteToHHMM(win.endMinute) : '17:00';
+            const windows = [...(weeklyByDay.get(dayOfWeek) ?? [])].sort(
+              (a, b) => a.startMinute - b.startMinute,
+            );
 
             return (
               <div key={dayOfWeek} className="availability-week-row">
-                <div style={{ fontWeight: 900, color: 'var(--text)' }}>{label}</div>
-                <div>
-                  <Input
-                    type="time"
-                    disabled={!enabled}
-                    value={start}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setWeekly((prev) => {
-                        const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
-                        if (!enabled) return prev;
-                        return [...other, { dayOfWeek, startMinute: hhmmToMinute(v), endMinute: win.endMinute }];
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <Input
-                    type="time"
-                    disabled={!enabled}
-                    value={end}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      setWeekly((prev) => {
-                        const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
-                        if (!enabled) return prev;
-                        return [...other, { dayOfWeek, startMinute: win.startMinute, endMinute: Math.max(hhmmToMinute(v), win.startMinute + 30) }];
-                      });
-                    }}
-                  />
+                <div className="availability-week-day">{label}</div>
+                <div className="availability-day-windows">
+                  {windows.length === 0 ? (
+                    <div className="availability-event-empty">Not available</div>
+                  ) : (
+                    windows.map((win, index) => (
+                      <div className="availability-window-row" key={`${dayOfWeek}-${index}-${win.startMinute}-${win.endMinute}`}>
+                        <select
+                          className="cc-input availability-time-select"
+                          value={minuteToHHMM(win.startMinute)}
+                          onChange={(e) => {
+                            const startMinute = hhmmToMinute(e.target.value);
+                            setWeekly((prev) => {
+                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
+                                (a, b) => a.startMinute - b.startMinute,
+                              );
+                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
+                              if (!dayWindows[index]) return prev;
+                              const current = dayWindows[index];
+                              dayWindows[index] = {
+                                ...current,
+                                startMinute,
+                                endMinute: Math.max(current.endMinute, startMinute + MIN_WINDOW_MINUTES),
+                              };
+                              return [...other, ...dayWindows];
+                            });
+                          }}
+                        >
+                          {timeOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          className="cc-input availability-time-select"
+                          value={minuteToHHMM(win.endMinute)}
+                          onChange={(e) => {
+                            const endMinute = hhmmToMinute(e.target.value);
+                            setWeekly((prev) => {
+                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
+                                (a, b) => a.startMinute - b.startMinute,
+                              );
+                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
+                              if (!dayWindows[index]) return prev;
+                              const current = dayWindows[index];
+                              dayWindows[index] = {
+                                ...current,
+                                endMinute: Math.max(endMinute, current.startMinute + MIN_WINDOW_MINUTES),
+                              };
+                              return [...other, ...dayWindows];
+                            });
+                          }}
+                        >
+                          {timeOptions.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          title={`Remove this time from ${label}`}
+                          aria-label={`Remove this time from ${label}`}
+                          onClick={() => {
+                            setWeekly((prev) => {
+                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
+                                (a, b) => a.startMinute - b.startMinute,
+                              );
+                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
+                              if (!dayWindows[index]) return prev;
+                              dayWindows.splice(index, 1);
+                              return [...other, ...dayWindows];
+                            });
+                          }}
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'end', gap: 10 }}>
                   <Button
+                    type="button"
                     variant="secondary"
+                    title={`Add time for ${label}`}
+                    aria-label={`Add time for ${label}`}
                     onClick={() => {
                       setWeekly((prev) => {
+                        const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
+                          (a, b) => a.startMinute - b.startMinute,
+                        );
                         const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
-                        if (enabled) return other;
-                        return [...other, { dayOfWeek, startMinute: hhmmToMinute(start), endMinute: hhmmToMinute(end) }];
+                        const lastEnd = dayWindows.length
+                          ? dayWindows[dayWindows.length - 1].endMinute
+                          : hhmmToMinute("09:00");
+                        const startMinute = Math.min(lastEnd, hhmmToMinute("22:30"));
+                        const endMinute = Math.min(startMinute + 60, hhmmToMinute("23:59"));
+                        dayWindows.push({
+                          dayOfWeek,
+                          startMinute,
+                          endMinute: Math.max(endMinute, startMinute + MIN_WINDOW_MINUTES),
+                        });
+                        return [...other, ...dayWindows];
                       });
                     }}
                   >
-                    {enabled ? 'Disable' : 'Enable'}
+                    + Add time
                   </Button>
                 </div>
               </div>
             );
           })}
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <div className="app-section-title" style={{ fontSize: 16 }}>Booking rules</div>
+          <div className="app-section-subtitle">Control timezone, notice period, and booking buffers.</div>
+
+          <div className="availability-config-grid" style={{ marginTop: 12 }}>
+            <div>
+              <Label>Timezone (IANA)</Label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <select
+                  className="cc-input"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                >
+                  {timezoneOptions.map((tz) => (
+                    <option key={tz} value={tz}>
+                      {tz}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setTimezone("UTC")}
+                  title="Reset timezone"
+                  aria-label="Reset timezone to UTC"
+                >
+                  ×
+                </Button>
+              </div>
+            </div>
+            <div className="availability-config-grid">
+              <div>
+                <Label>Min notice (minutes)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={String(minNoticeMinutes)}
+                  onChange={(e) => setMinNoticeMinutes(Number(e.target.value))}
+                />
+              </div>
+              <div>
+                <Label>Max days in future</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={String(maxDaysInFuture)}
+                  onChange={(e) => setMaxDaysInFuture(Number(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="availability-config-grid" style={{ marginTop: 12 }}>
+            <div>
+              <Label>Buffer before (minutes)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={String(bufferBeforeMinutes)}
+                onChange={(e) => setBufferBeforeMinutes(Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label>Buffer after (minutes)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={String(bufferAfterMinutes)}
+                onChange={(e) => setBufferAfterMinutes(Number(e.target.value))}
+              />
+            </div>
+          </div>
         </div>
 
         {error ? (
