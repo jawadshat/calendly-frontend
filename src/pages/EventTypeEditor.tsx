@@ -55,7 +55,7 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.mode, id]);
 
-  if (initialLoading) return <div style={{ color: '#64748b', fontWeight: 700 }}>Loading…</div>;
+  if (initialLoading) return <div style={{ color: 'var(--muted)', fontWeight: 700 }}>Loading…</div>;
 
   return (
     <div className="editor-wrap">
@@ -90,7 +90,7 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, color: '#334155' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, color: 'var(--muted)' }}>
               <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
               Active
             </label>

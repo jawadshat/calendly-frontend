@@ -39,7 +39,7 @@ export function Register() {
       </div>
       <Card>
         <h2 style={{ margin: 0 }}>Create your account</h2>
-        <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>
+        <div style={{ color: 'var(--muted)', fontSize: 13, marginTop: 6 }}>
           Choose a username — it becomes your public scheduling link.
         </div>
 

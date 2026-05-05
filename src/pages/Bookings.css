@@ -30,3 +30,9 @@
     align-items: flex-start;
   }
 }
+
+[data-theme='dark'] .booking-pill {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+  border-color: rgba(74, 222, 128, 0.34);
+}

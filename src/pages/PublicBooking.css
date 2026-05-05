@@ -250,3 +250,36 @@
     margin: 16px auto;
   }
 }
+
+[data-theme='dark'] .pb-sub,
+[data-theme='dark'] .pb-muted-line,
+[data-theme='dark'] .react-calendar__month-view__weekdays__weekday abbr,
+[data-theme='dark'] .pb-confirm-sub {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .pb-label,
+[data-theme='dark'] .pb-times-title,
+[data-theme='dark'] .pb-form-title,
+[data-theme='dark'] .pb-confirm-title,
+[data-theme='dark'] .react-calendar__navigation button,
+[data-theme='dark'] .react-calendar__tile {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .pb-calendar-wrap,
+[data-theme='dark'] .pb-time-btn,
+[data-theme='dark'] .pb-empty-state {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .pb-form {
+  border-top-color: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme='dark'] .pb-google-day-selected {
+  background: rgba(59, 130, 246, 0.28) !important;
+  color: #dbeafe !important;
+}

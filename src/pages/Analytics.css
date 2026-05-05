@@ -530,3 +530,57 @@
     grid-template-columns: 1fr;
   }
 }
+
+[data-theme='dark'] .analytics-wrap {
+  color: var(--text);
+}
+
+[data-theme='dark'] .analytics-stat,
+[data-theme='dark'] .analytics-kpi-card,
+[data-theme='dark'] .analytics-trend,
+[data-theme='dark'] .analytics-weekdays,
+[data-theme='dark'] .analytics-distribution,
+[data-theme='dark'] .analytics-insights,
+[data-theme='dark'] .analytics-line-wrap,
+[data-theme='dark'] .analytics-slot-card,
+[data-theme='dark'] .analytics-legend-item {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.24);
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
+}
+
+[data-theme='dark'] .analytics-kpi-card span,
+[data-theme='dark'] .analytics-kpi-card small,
+[data-theme='dark'] .analytics-trend-label,
+[data-theme='dark'] .analytics-weekday-label,
+[data-theme='dark'] .analytics-line-labels span,
+[data-theme='dark'] .analytics-insights ul,
+[data-theme='dark'] .analytics-slot-card span {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .analytics-kpi-card strong,
+[data-theme='dark'] .analytics-trend-value,
+[data-theme='dark'] .analytics-weekday-value,
+[data-theme='dark'] .analytics-donut-total,
+[data-theme='dark'] .analytics-legend-item strong,
+[data-theme='dark'] .analytics-line-labels strong,
+[data-theme='dark'] .analytics-slot-card strong {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .analytics-donut-caption {
+  fill: #94a3b8;
+}
+
+[data-theme='dark'] .analytics-trend-bar-wrap,
+[data-theme='dark'] .analytics-weekday-track,
+[data-theme='dark'] .analytics-slot-track {
+  background: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme='dark'] .analytics-insights ul li {
+  background: #0f172a;
+  border-color: rgba(148, 163, 184, 0.22);
+  color: #cbd5e1;
+}

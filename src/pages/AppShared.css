@@ -240,3 +240,38 @@
     text-align: center;
   }
 }
+
+[data-theme='dark'] .app-hero-card {
+  background: linear-gradient(135deg, #111c33, #1e3a8a);
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+[data-theme='dark'] .app-stat,
+[data-theme='dark'] .app-event-card {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+[data-theme='dark'] .app-stat-label,
+[data-theme='dark'] .app-section-subtitle,
+[data-theme='dark'] .app-muted,
+[data-theme='dark'] .app-event-meta {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .app-stat-value,
+[data-theme='dark'] .app-event-title,
+[data-theme='dark'] .app-event-meta code {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .app-link-btn {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme='dark'] .app-link-btn-open {
+  background: linear-gradient(160deg, #1e3a8a, #1d4ed8);
+  color: #dbeafe;
+}

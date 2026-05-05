@@ -17,7 +17,7 @@ export function Card(props: { children: ReactNode; style?: React.CSSProperties; 
 
 export function Label(props: { children: ReactNode; htmlFor?: string }) {
   return (
-    <label htmlFor={props.htmlFor} style={{ fontSize: 12, fontWeight: 900, color: '#334155', marginBottom: 6, display: 'block' }}>
+    <label htmlFor={props.htmlFor} style={{ fontSize: 12, fontWeight: 900, color: 'var(--muted)', marginBottom: 6, display: 'block' }}>
       {props.children}
     </label>
   );

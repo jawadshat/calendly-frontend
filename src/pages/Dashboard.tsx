@@ -41,7 +41,7 @@ export function Dashboard() {
   }, []);
 
   if (loading)
-    return <div style={{ color: "#64748b", fontWeight: 700 }}>Loading…</div>;
+    return <div style={{ color: "var(--muted)", fontWeight: 700 }}>Loading…</div>;
   if (error)
     return (
       <div style={{ color: "#b91c1c", fontWeight: 800 }}>{String(error)}</div>

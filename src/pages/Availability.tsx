@@ -108,7 +108,7 @@ export function Availability() {
     [eventTypes, selectedEventTypeId],
   );
 
-  if (loading) return <div style={{ color: '#64748b', fontWeight: 700 }}>Loading…</div>;
+  if (loading) return <div style={{ color: 'var(--muted)', fontWeight: 700 }}>Loading…</div>;
 
   async function loadAvailabilityForEventType(eventTypeId: string) {
     const a = (await api.eventTypeAvailability(eventTypeId)).availability;
@@ -183,7 +183,7 @@ export function Availability() {
             : 'Not connected. Each host should connect their own Google account.'}
         </div>
         {googleStatus ? (
-          <div style={{ marginTop: 10, color: '#1d4ed8', fontWeight: 700 }}>{googleStatus}</div>
+          <div style={{ marginTop: 10, color: 'var(--primary)', fontWeight: 700 }}>{googleStatus}</div>
         ) : null}
       </Card>
 
@@ -295,7 +295,7 @@ export function Availability() {
 
             return (
               <div key={dayOfWeek} className="availability-week-row">
-                <div style={{ fontWeight: 900, color: '#334155' }}>{label}</div>
+                <div style={{ fontWeight: 900, color: 'var(--text)' }}>{label}</div>
                 <div>
                   <Input
                     type="time"

@@ -256,9 +256,9 @@
   place-items: center;
   font-size: 12px;
   font-weight: 800;
-  color: #0f172a;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  background: rgba(255, 255, 255, 0.8);
+  color: #dbeafe;
+  border: 1px solid rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-rail-item:hover {
@@ -319,9 +319,9 @@
 }
 
 .ws-theme-s1 .ws-rail-logo {
-  color: #0b3b87;
-  border-color: rgba(11, 59, 135, 0.2);
-  background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-theme-s2 {
@@ -329,9 +329,9 @@
 }
 
 .ws-theme-s2 .ws-rail-logo {
-  color: #0f766e;
-  border-color: rgba(15, 118, 110, 0.22);
-  background: linear-gradient(145deg, #ccfbf1, #99f6e4);
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-theme-s3 {
@@ -339,9 +339,9 @@
 }
 
 .ws-theme-s3 .ws-rail-logo {
-  color: #4338ca;
-  border-color: rgba(67, 56, 202, 0.22);
-  background: linear-gradient(145deg, #e0e7ff, #c7d2fe);
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-theme-s4 {
@@ -349,9 +349,9 @@
 }
 
 .ws-theme-s4 .ws-rail-logo {
-  color: #c2410c;
-  border-color: rgba(194, 65, 12, 0.2);
-  background: linear-gradient(145deg, #ffedd5, #fed7aa);
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-theme-s5 {
@@ -359,9 +359,9 @@
 }
 
 .ws-theme-s5 .ws-rail-logo {
-  color: #166534;
-  border-color: rgba(22, 101, 52, 0.2);
-  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.34);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
 }
 
 .ws-stage {
@@ -999,4 +999,100 @@
   .ws-mobile-stage .ws-media-browser {
     width: 100%;
   }
+}
+
+[data-theme='dark'] .ws-page {
+  color: var(--text);
+  background:
+    radial-gradient(950px 520px at 0% 0%, rgba(56, 189, 248, 0.18), transparent 65%),
+    radial-gradient(860px 460px at 100% 20%, rgba(99, 102, 241, 0.2), transparent 60%),
+    linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+}
+
+[data-theme='dark'] .ws-hero p,
+[data-theme='dark'] .ws-head p,
+[data-theme='dark'] .ws-rail-item-desc,
+[data-theme='dark'] .ws-proof-card p,
+[data-theme='dark'] .ws-premium-card p,
+[data-theme='dark'] .ws-logos p {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .ws-btn-secondary,
+[data-theme='dark'] .ws-hero-meta div,
+[data-theme='dark'] .ws-logo-row span,
+[data-theme='dark'] .ws-rail-item,
+[data-theme='dark'] .ws-stage,
+[data-theme='dark'] .ws-media-browser,
+[data-theme='dark'] .ws-media-hero,
+[data-theme='dark'] .ws-media-card,
+[data-theme='dark'] .ws-media-hero-grid div,
+[data-theme='dark'] .ws-premium-card,
+[data-theme='dark'] .ws-proof-card {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .ws-media-browser-head,
+[data-theme='dark'] .ws-media-browser-head small,
+[data-theme='dark'] .ws-media-hero-grid div small,
+[data-theme='dark'] .ws-proof-card span,
+[data-theme='dark'] .ws-hero-meta span {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .ws-media-browser-head {
+  border-bottom-color: rgba(148, 163, 184, 0.2);
+}
+
+[data-theme='dark'] .ws-rail-item-title,
+[data-theme='dark'] .ws-media-hero-top strong,
+[data-theme='dark'] .ws-media-hero-grid div strong,
+[data-theme='dark'] .ws-media-card strong,
+[data-theme='dark'] .ws-proof-card strong {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .ws-rail-logo {
+  color: #dbeafe;
+  border-color: rgba(148, 163, 184, 0.3);
+  background: #1e293b;
+}
+
+[data-theme='dark'] .ws-media-s2 .ws-media-hero-grid div,
+[data-theme='dark'] .ws-media-s3 .ws-media-hero-grid div,
+[data-theme='dark'] .ws-media-s4 .ws-media-hero-grid div,
+[data-theme='dark'] .ws-media-s5 .ws-media-hero-grid div,
+[data-theme='dark'] .ws-media-hero,
+[data-theme='dark'] .ws-media-s2 .ws-media-card,
+[data-theme='dark'] .ws-media-s3 .ws-media-card,
+[data-theme='dark'] .ws-media-s4 .ws-media-card,
+[data-theme='dark'] .ws-media-s5 .ws-media-card,
+[data-theme='dark'] .ws-theme-s1,
+[data-theme='dark'] .ws-theme-s2,
+[data-theme='dark'] .ws-theme-s3,
+[data-theme='dark'] .ws-theme-s4,
+[data-theme='dark'] .ws-theme-s5 {
+  background: #111c33;
+}
+
+[data-theme='dark'] .ws-media-hero-top span {
+  color: #dbeafe;
+  border-color: rgba(96, 165, 250, 0.36);
+  background: linear-gradient(145deg, #1d4ed8, #1e3a8a);
+}
+
+[data-theme='dark'] .ws-media-hero,
+[data-theme='dark'] .ws-media-hero-grid div,
+[data-theme='dark'] .ws-media-card,
+[data-theme='dark'] .ws-rail-item {
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+[data-theme='dark'] .ws-rail-item-sub,
+[data-theme='dark'] .ws-media-hero-grid div small,
+[data-theme='dark'] .ws-media-browser-head small,
+[data-theme='dark'] .ws-rail-item-desc {
+  color: #94a3b8;
 }

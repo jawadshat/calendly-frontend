@@ -93,7 +93,7 @@ export function PublicBooking() {
 
   if (loading)
     return (
-      <div style={{ color: "#64748b", fontWeight: 800 }}>
+      <div style={{ color: "var(--muted)", fontWeight: 800 }}>
         Loading scheduling page…
       </div>
     );

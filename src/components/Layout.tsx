@@ -9,9 +9,11 @@ import {
 } from "react-router-dom";
 import { getToken, logout } from "../lib/auth";
 import { api } from "../lib/api";
+import { useTheme } from "../lib/useTheme";
 import "../pages/AppChrome.css";
 
 export function Layout() {
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const authed = Boolean(getToken());
@@ -111,6 +113,18 @@ export function Layout() {
           </Link>
 
           <div className="app-top-actions">
+            <button
+              type="button"
+              className="app-theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            >
+              <span className="app-theme-toggle-icon" aria-hidden="true">
+                {theme === "light" ? "🌙" : "☀️"}
+              </span>
+              <span>{theme === "light" ? "Night" : "Day"}</span>
+            </button>
             {!authed ? (
               <nav className="app-nav" aria-label="Primary">
                 <div className="app-nav-shell">

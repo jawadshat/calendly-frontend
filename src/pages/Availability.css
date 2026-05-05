@@ -134,3 +134,38 @@
     overflow-wrap: anywhere;
   }
 }
+
+[data-theme='dark'] .availability-event-card,
+[data-theme='dark'] .availability-event-chip,
+[data-theme='dark'] .availability-week-row {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .availability-event-card-title,
+[data-theme='dark'] .availability-event-chip-title {
+  color: #e2e8f0;
+}
+
+[data-theme='dark'] .availability-event-card-subtitle,
+[data-theme='dark'] .availability-event-chip-meta,
+[data-theme='dark'] .availability-event-empty {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .availability-event-empty {
+  background: #0f172a;
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+[data-theme='dark'] .availability-event-chip.is-active {
+  background: linear-gradient(170deg, #1e3a8a, #1d4ed8);
+  border-color: rgba(96, 165, 250, 0.5);
+}
+
+[data-theme='dark'] .availability-event-selected {
+  color: #dbeafe;
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(96, 165, 250, 0.3);
+}

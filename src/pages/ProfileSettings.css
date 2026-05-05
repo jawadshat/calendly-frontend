@@ -54,3 +54,22 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+[data-theme='dark'] .profile-settings-avatar {
+  color: #dbeafe;
+  background: linear-gradient(150deg, #1d4ed8, #1e3a8a);
+  border-color: rgba(96, 165, 250, 0.34);
+}
+
+[data-theme='dark'] .profile-settings-item {
+  background: #111c33;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+[data-theme='dark'] .profile-settings-item span {
+  color: #94a3b8;
+}
+
+[data-theme='dark'] .profile-settings-item strong {
+  color: #e2e8f0;
+}

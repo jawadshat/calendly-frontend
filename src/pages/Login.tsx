@@ -36,7 +36,7 @@ export function Login() {
       </div>
       <Card>
         <h2 style={{ margin: 0 }}>Log in</h2>
-        <div style={{ color: '#64748b', fontSize: 13, marginTop: 6 }}>Access your scheduling dashboard.</div>
+        <div style={{ color: 'var(--muted)', fontSize: 13, marginTop: 6 }}>Access your scheduling dashboard.</div>
 
         <form
           onSubmit={async (e) => {
