@@ -21,7 +21,7 @@
 }
 
 .app-top-inner {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 12px 18px;
   display: flex;
@@ -294,7 +294,7 @@
 
 .app-main {
   flex: 1;
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 28px 18px;
   width: 100%;
@@ -302,7 +302,7 @@
 }
 
 .app-main-dashboard {
-  max-width: 1240px;
+  max-width: 1440px;
   display: grid;
   grid-template-columns: 250px 1fr;
   gap: 16px;
@@ -489,7 +489,7 @@
 }
 
 .app-footer-inner {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 40px 18px 22px;
   display: flex;
@@ -865,6 +865,15 @@
   .app-mobile-menu-btn {
     width: 36px;
     height: 32px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .app-top-inner,
+  .app-main,
+  .app-main-dashboard,
+  .app-footer-inner {
+    max-width: 1640px;
   }
 }
 

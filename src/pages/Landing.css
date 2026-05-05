@@ -7,7 +7,7 @@
 }
 
 .lp-wrap {
-  width: min(1120px, calc(100% - 48px));
+  width: min(1380px, calc(100% - 48px));
   margin: 0 auto;
 }
 
@@ -1947,6 +1947,12 @@
   .lp-cta-box {
     padding: 28px 18px;
     border-radius: 16px;
+  }
+}
+
+@media (min-width: 1680px) {
+  .lp-wrap {
+    width: min(1640px, calc(100% - 72px));
   }
 }
 
