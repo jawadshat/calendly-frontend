@@ -1,25 +1,41 @@
 /** Event-type specific availability editor and Google Calendar connection view. */
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../lib/api';
-import { getToken } from '../lib/auth';
-import { formatApiError } from '../lib/formatError';
-import { Button, Card, ErrorText, Input, Label } from '../components/ui';
-import './AppShared.css';
-import './Availability.css';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { api } from "../lib/api";
+import { getToken } from "../lib/auth";
+import { formatApiError } from "../lib/formatError";
+import { Button, Card, ErrorText, Input, Label } from "../components/ui";
+import "./AppShared.css";
+import "./Availability.css";
 
-const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const DOW_FULL = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+] as const;
 const MIN_WINDOW_MINUTES = 30;
 
 function hhmmToMinute(s: string) {
-  const [hh, mm] = s.split(':').map((x) => Number(x));
+  const [hh, mm] = s.split(":").map((x) => Number(x));
   if (!Number.isFinite(hh) || !Number.isFinite(mm)) return 0;
   return Math.max(0, Math.min(24 * 60 - 1, hh * 60 + mm));
 }
 function minuteToHHMM(m: number) {
-  const hh = String(Math.floor(m / 60)).padStart(2, '0');
-  const mm = String(m % 60).padStart(2, '0');
+  const hh = String(Math.floor(m / 60)).padStart(2, "0");
+  const mm = String(m % 60).padStart(2, "0");
   return `${hh}:${mm}`;
+}
+function minuteToAmPm(m: number) {
+  const hours24 = Math.floor(m / 60) % 24;
+  const minutes = m % 60;
+  const meridiem = hours24 >= 12 ? "PM" : "AM";
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+  return `${hours12}:${String(minutes).padStart(2, "0")} ${meridiem}`;
 }
 
 type Weekly = { dayOfWeek: number; startMinute: number; endMinute: number };
@@ -28,8 +44,8 @@ export function Availability() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [eventTypes, setEventTypes] = useState<any[]>([]);
-  const [selectedEventTypeId, setSelectedEventTypeId] = useState('');
-  const [timezone, setTimezone] = useState('UTC');
+  const [selectedEventTypeId, setSelectedEventTypeId] = useState("");
+  const [timezone, setTimezone] = useState("UTC");
   const [bufferBeforeMinutes, setBufferBeforeMinutes] = useState(0);
   const [bufferAfterMinutes, setBufferAfterMinutes] = useState(0);
   const [minNoticeMinutes, setMinNoticeMinutes] = useState(60);
@@ -50,9 +66,15 @@ export function Availability() {
   const [googleConnected, setGoogleConnected] = useState(false);
   const [googleEmail, setGoogleEmail] = useState<string | null>(null);
   const [googleStatus, setGoogleStatus] = useState<string | null>(null);
+  const [copyTargetByDay, setCopyTargetByDay] = useState<
+    Record<number, number[]>
+  >({});
+  const [openDayPickerByDay, setOpenDayPickerByDay] = useState<
+    Record<number, boolean>
+  >({});
 
   useEffect(() => {
-    if (!getToken()) navigate('/login');
+    if (!getToken()) navigate("/login");
   }, [navigate]);
 
   useEffect(() => {
@@ -60,17 +82,22 @@ export function Availability() {
       try {
         setLoading(true);
         setError(null);
-        const [me, eventTypesRes] = await Promise.all([api.me(), api.listEventTypes()]);
+        const [me, eventTypesRes] = await Promise.all([
+          api.me(),
+          api.listEventTypes(),
+        ]);
         setGoogleConnected(Boolean(me?.googleCalendarConnected));
         setGoogleEmail(me?.googleCalendarEmail ?? null);
         setEventTypes(eventTypesRes.items ?? []);
-        const firstEventTypeId = eventTypesRes.items?.[0]?._id ? String(eventTypesRes.items[0]._id) : '';
+        const firstEventTypeId = eventTypesRes.items?.[0]?._id
+          ? String(eventTypesRes.items[0]._id)
+          : "";
         setSelectedEventTypeId(firstEventTypeId);
         const a = firstEventTypeId
           ? (await api.eventTypeAvailability(firstEventTypeId)).availability
           : me.availability;
         if (a) {
-          setTimezone(a.timezone ?? 'UTC');
+          setTimezone(a.timezone ?? "UTC");
           setBufferBeforeMinutes(a.bufferBeforeMinutes ?? 0);
           setBufferAfterMinutes(a.bufferAfterMinutes ?? 0);
           setMinNoticeMinutes(a.minNoticeMinutes ?? 60);
@@ -78,7 +105,7 @@ export function Availability() {
           setWeekly(Array.isArray(a.weekly) ? a.weekly : []);
         }
       } catch (e: any) {
-        setError(e?.error ?? 'Failed to load availability');
+        setError(e?.error ?? "Failed to load availability");
       } finally {
         setLoading(false);
       }
@@ -86,12 +113,15 @@ export function Availability() {
   }, []);
 
   useEffect(() => {
-    const google = searchParams.get('google');
+    const google = searchParams.get("google");
     if (!google) return;
-    if (google === 'connected') setGoogleStatus('Google Calendar connected successfully.');
-    else if (google === 'not-configured') setGoogleStatus('Google Calendar is not configured on server.');
-    else if (google === 'invalid-state') setGoogleStatus('Google Calendar connect session expired. Try again.');
-    else setGoogleStatus('Google Calendar connection failed. Please retry.');
+    if (google === "connected")
+      setGoogleStatus("Google Calendar connected successfully.");
+    else if (google === "not-configured")
+      setGoogleStatus("Google Calendar is not configured on server.");
+    else if (google === "invalid-state")
+      setGoogleStatus("Google Calendar connect session expired. Try again.");
+    else setGoogleStatus("Google Calendar connection failed. Please retry.");
   }, [searchParams]);
 
   const weeklyByDay = useMemo(() => {
@@ -111,20 +141,68 @@ export function Availability() {
   const timezoneOptions = useMemo(() => {
     const fallback = [
       "UTC",
+      "Pacific/Honolulu",
+      "America/Anchorage",
+      "America/Vancouver",
+      "America/Los_Angeles",
+      "America/Phoenix",
+      "America/Denver",
+      "America/Chicago",
+      "America/Toronto",
+      "America/New_York",
+      "America/Mexico_City",
+      "America/Bogota",
+      "America/Lima",
+      "America/Santiago",
+      "America/Sao_Paulo",
+      "America/Argentina/Buenos_Aires",
+      "America/Caracas",
       "Asia/Karachi",
+      "Asia/Kabul",
       "Asia/Dubai",
+      "Asia/Riyadh",
       "Asia/Kolkata",
+      "Asia/Kathmandu",
+      "Asia/Dhaka",
+      "Asia/Bangkok",
       "Asia/Singapore",
+      "Asia/Hong_Kong",
+      "Asia/Shanghai",
       "Asia/Tokyo",
+      "Asia/Seoul",
+      "Asia/Jakarta",
+      "Asia/Manila",
+      "Asia/Ho_Chi_Minh",
+      "Asia/Colombo",
+      "Asia/Tehran",
+      "Asia/Baku",
+      "Asia/Tashkent",
+      "Asia/Almaty",
+      "Asia/Yekaterinburg",
       "Europe/London",
       "Europe/Berlin",
       "Europe/Paris",
-      "America/New_York",
-      "America/Chicago",
-      "America/Denver",
-      "America/Los_Angeles",
-      "America/Toronto",
+      "Europe/Amsterdam",
+      "Europe/Madrid",
+      "Europe/Rome",
+      "Europe/Zurich",
+      "Europe/Stockholm",
+      "Europe/Warsaw",
+      "Europe/Athens",
+      "Europe/Istanbul",
+      "Europe/Moscow",
+      "Africa/Cairo",
+      "Africa/Johannesburg",
+      "Africa/Nairobi",
+      "Africa/Lagos",
+      "Australia/Perth",
       "Australia/Sydney",
+      "Australia/Melbourne",
+      "Australia/Brisbane",
+      "Australia/Adelaide",
+      "Australia/Darwin",
+      "Pacific/Auckland",
+      "Pacific/Fiji",
     ];
     return Array.from(new Set([timezone, ...fallback])).sort();
   }, [timezone]);
@@ -134,20 +212,32 @@ export function Availability() {
       60,
       Number.isFinite(eventDuration) && eventDuration > 0 ? eventDuration : 60,
     );
-    const options: { value: string; label: string }[] = [];
+    const values = new Set<string>();
     for (let minutes = 0; minutes < 24 * 60; minutes += timeStepMinutes) {
-      const value = minuteToHHMM(minutes);
-      options.push({ value, label: value });
+      values.add(minuteToHHMM(minutes));
     }
-    return options;
-  }, [selectedEventType?.durationMinutes]);
+    for (const slot of weekly) {
+      values.add(minuteToHHMM(slot.startMinute));
+      values.add(minuteToHHMM(slot.endMinute));
+    }
 
-  if (loading) return <div style={{ color: 'var(--muted)', fontWeight: 700 }}>Loading…</div>;
+    return Array.from(values)
+      .sort((a, b) => hhmmToMinute(a) - hhmmToMinute(b))
+      .map((value) => ({
+        value,
+        label: minuteToAmPm(hhmmToMinute(value)),
+      }));
+  }, [selectedEventType?.durationMinutes, weekly]);
+
+  if (loading)
+    return (
+      <div style={{ color: "var(--muted)", fontWeight: 700 }}>Loading…</div>
+    );
 
   async function loadAvailabilityForEventType(eventTypeId: string) {
     const a = (await api.eventTypeAvailability(eventTypeId)).availability;
     if (!a) {
-      setTimezone('UTC');
+      setTimezone("UTC");
       setBufferBeforeMinutes(0);
       setBufferAfterMinutes(0);
       setMinNoticeMinutes(60);
@@ -155,7 +245,7 @@ export function Availability() {
       setWeekly([]);
       return;
     }
-    setTimezone(a.timezone ?? 'UTC');
+    setTimezone(a.timezone ?? "UTC");
     setBufferBeforeMinutes(a.bufferBeforeMinutes ?? 0);
     setBufferAfterMinutes(a.bufferAfterMinutes ?? 0);
     setMinNoticeMinutes(a.minNoticeMinutes ?? 60);
@@ -163,11 +253,39 @@ export function Availability() {
     setWeekly(Array.isArray(a.weekly) ? a.weekly : []);
   }
 
+  function copyDayWindowsToDays(sourceDayOfWeek: number, targetDays: number[]) {
+    const validTargetDays = targetDays.filter((day) => day !== sourceDayOfWeek);
+    if (validTargetDays.length === 0) return;
+    setWeekly((prev) => {
+      const sourceWindows = [
+        ...prev.filter((x) => x.dayOfWeek === sourceDayOfWeek),
+      ].sort((a, b) => a.startMinute - b.startMinute);
+      if (sourceWindows.length === 0) return prev;
+
+      const targetSet = new Set(validTargetDays);
+      const otherDays = prev.filter((x) => !targetSet.has(x.dayOfWeek));
+      const copiedWindows: Weekly[] = [];
+      for (const targetDay of validTargetDays) {
+        for (const win of sourceWindows) {
+          copiedWindows.push({
+            dayOfWeek: targetDay,
+            startMinute: win.startMinute,
+            endMinute: win.endMinute,
+          });
+        }
+      }
+      return [...otherDays, ...copiedWindows];
+    });
+    setSavedAt(null);
+  }
+
   return (
     <div className="availability-wrap">
       <div className="app-hero-card">
         <h1 className="app-hero-title">Availability</h1>
-        <p className="app-hero-subtitle">Set your preferred hours so people only book when it works for you.</p>
+        <p className="app-hero-subtitle">
+          Set your preferred hours so people only book when it works for you.
+        </p>
       </div>
 
       <Card>
@@ -175,7 +293,8 @@ export function Availability() {
           <div>
             <h2 className="app-section-title">Google Calendar</h2>
             <p className="app-section-subtitle">
-              Connect your own Google Calendar so bookings block busy times and auto-create events.
+              Connect your own Google Calendar so bookings block busy times and
+              auto-create events.
             </p>
           </div>
           {googleConnected ? (
@@ -187,7 +306,7 @@ export function Availability() {
                   await api.googleCalendarDisconnect();
                   setGoogleConnected(false);
                   setGoogleEmail(null);
-                  setGoogleStatus('Google Calendar disconnected.');
+                  setGoogleStatus("Google Calendar disconnected.");
                 } catch (e: any) {
                   setError(formatApiError(e));
                 }
@@ -213,23 +332,33 @@ export function Availability() {
         </div>
         <div className="app-muted" style={{ marginTop: 8, fontWeight: 700 }}>
           {googleConnected
-            ? `Connected${googleEmail ? ` as ${googleEmail}` : ''}`
-            : 'Not connected. Each host should connect their own Google account.'}
+            ? `Connected${googleEmail ? ` as ${googleEmail}` : ""}`
+            : "Not connected. Each host should connect their own Google account."}
         </div>
         {googleStatus ? (
-          <div style={{ marginTop: 10, color: 'var(--primary)', fontWeight: 700 }}>{googleStatus}</div>
+          <div
+            style={{ marginTop: 10, color: "var(--primary)", fontWeight: 700 }}
+          >
+            {googleStatus}
+          </div>
         ) : null}
       </Card>
 
       <Card>
         <div className="availability-event-card">
           <div>
-            <div className="availability-event-card-title">Event type schedule</div>
-            <div className="availability-event-card-subtitle">Each event type can have a different weekly routine.</div>
+            <div className="availability-event-card-title">
+              Event type schedule
+            </div>
+            <div className="availability-event-card-subtitle">
+              Each event type can have a different weekly routine.
+            </div>
           </div>
           <div className="availability-event-type-list">
             {eventTypes.length === 0 ? (
-              <div className="availability-event-empty">Create an event type first to set availability.</div>
+              <div className="availability-event-empty">
+                Create an event type first to set availability.
+              </div>
             ) : (
               eventTypes.map((it) => {
                 const isActive = String(it._id) === selectedEventTypeId;
@@ -237,7 +366,7 @@ export function Availability() {
                   <button
                     key={it._id}
                     type="button"
-                    className={`availability-event-chip${isActive ? ' is-active' : ''}`}
+                    className={`availability-event-chip${isActive ? " is-active" : ""}`}
                     onClick={async () => {
                       const nextId = String(it._id);
                       if (nextId === selectedEventTypeId) return;
@@ -247,11 +376,16 @@ export function Availability() {
                       try {
                         await loadAvailabilityForEventType(nextId);
                       } catch (err: any) {
-                        setError(err?.error ?? 'Failed to load event type availability');
+                        setError(
+                          err?.error ??
+                            "Failed to load event type availability",
+                        );
                       }
                     }}
                   >
-                    <span className="availability-event-chip-title">{it.title}</span>
+                    <span className="availability-event-chip-title">
+                      {it.title}
+                    </span>
                     <span className="availability-event-chip-meta">
                       {it.durationMinutes}m • /{it.slug}
                     </span>
@@ -262,7 +396,8 @@ export function Availability() {
           </div>
           {selectedEventType ? (
             <div className="availability-event-selected">
-              Editing: <strong>{selectedEventType.title}</strong> ({selectedEventType.durationMinutes} mins)
+              Editing: <strong>{selectedEventType.title}</strong> (
+              {selectedEventType.durationMinutes} mins)
             </div>
           ) : null}
         </div>
@@ -270,38 +405,61 @@ export function Availability() {
 
       <Card>
         <div className="app-section-title">Weekly hours</div>
-        <div className="app-section-subtitle">Enable the days you want to accept meetings.</div>
-        <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
+        <div className="app-section-subtitle">
+          Enable the days you want to accept meetings.
+        </div>
+        <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
           {DOW.map((label, dayOfWeek) => {
             const windows = [...(weeklyByDay.get(dayOfWeek) ?? [])].sort(
               (a, b) => a.startMinute - b.startMinute,
             );
+            const selectableTargetDays = DOW.map((_, i) => i).filter(
+              (i) => i !== dayOfWeek,
+            );
+            const selectedTargetDays = copyTargetByDay[dayOfWeek] ?? [];
+            const isDayPickerOpen = Boolean(openDayPickerByDay[dayOfWeek]);
+            const selectedDaysLabel =
+              selectedTargetDays.length === 0
+                ? "Select days"
+                : selectedTargetDays.map((day) => DOW_FULL[day]).join(", ");
 
             return (
               <div key={dayOfWeek} className="availability-week-row">
                 <div className="availability-week-day">{label}</div>
                 <div className="availability-day-windows">
                   {windows.length === 0 ? (
-                    <div className="availability-event-empty">Not available</div>
+                    <div className="availability-event-empty">
+                      Not available
+                    </div>
                   ) : (
                     windows.map((win, index) => (
-                      <div className="availability-window-row" key={`${dayOfWeek}-${index}-${win.startMinute}-${win.endMinute}`}>
+                      <div
+                        className="availability-window-row"
+                        key={`${dayOfWeek}-${index}-${win.startMinute}-${win.endMinute}`}
+                      >
                         <select
                           className="cc-input availability-time-select"
                           value={minuteToHHMM(win.startMinute)}
                           onChange={(e) => {
                             const startMinute = hhmmToMinute(e.target.value);
                             setWeekly((prev) => {
-                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
-                                (a, b) => a.startMinute - b.startMinute,
+                              const dayWindows = [
+                                ...prev.filter(
+                                  (x) => x.dayOfWeek === dayOfWeek,
+                                ),
+                              ].sort((a, b) => a.startMinute - b.startMinute);
+                              const other = prev.filter(
+                                (x) => x.dayOfWeek !== dayOfWeek,
                               );
-                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
                               if (!dayWindows[index]) return prev;
                               const current = dayWindows[index];
                               dayWindows[index] = {
                                 ...current,
                                 startMinute,
-                                endMinute: Math.max(current.endMinute, startMinute + MIN_WINDOW_MINUTES),
+                                endMinute: Math.max(
+                                  current.endMinute,
+                                  startMinute + MIN_WINDOW_MINUTES,
+                                ),
                               };
                               return [...other, ...dayWindows];
                             });
@@ -319,15 +477,22 @@ export function Availability() {
                           onChange={(e) => {
                             const endMinute = hhmmToMinute(e.target.value);
                             setWeekly((prev) => {
-                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
-                                (a, b) => a.startMinute - b.startMinute,
+                              const dayWindows = [
+                                ...prev.filter(
+                                  (x) => x.dayOfWeek === dayOfWeek,
+                                ),
+                              ].sort((a, b) => a.startMinute - b.startMinute);
+                              const other = prev.filter(
+                                (x) => x.dayOfWeek !== dayOfWeek,
                               );
-                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
                               if (!dayWindows[index]) return prev;
                               const current = dayWindows[index];
                               dayWindows[index] = {
                                 ...current,
-                                endMinute: Math.max(endMinute, current.startMinute + MIN_WINDOW_MINUTES),
+                                endMinute: Math.max(
+                                  endMinute,
+                                  current.startMinute + MIN_WINDOW_MINUTES,
+                                ),
                               };
                               return [...other, ...dayWindows];
                             });
@@ -346,10 +511,14 @@ export function Availability() {
                           aria-label={`Remove this time from ${label}`}
                           onClick={() => {
                             setWeekly((prev) => {
-                              const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
-                                (a, b) => a.startMinute - b.startMinute,
+                              const dayWindows = [
+                                ...prev.filter(
+                                  (x) => x.dayOfWeek === dayOfWeek,
+                                ),
+                              ].sort((a, b) => a.startMinute - b.startMinute);
+                              const other = prev.filter(
+                                (x) => x.dayOfWeek !== dayOfWeek,
                               );
-                              const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
                               if (!dayWindows[index]) return prev;
                               dayWindows.splice(index, 1);
                               return [...other, ...dayWindows];
@@ -362,7 +531,9 @@ export function Availability() {
                     ))
                   )}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'end', gap: 10 }}>
+                <div
+                  style={{ display: "flex", justifyContent: "end", gap: 10 }}
+                >
                   <Button
                     type="button"
                     variant="secondary"
@@ -370,25 +541,109 @@ export function Availability() {
                     aria-label={`Add time for ${label}`}
                     onClick={() => {
                       setWeekly((prev) => {
-                        const dayWindows = [...prev.filter((x) => x.dayOfWeek === dayOfWeek)].sort(
-                          (a, b) => a.startMinute - b.startMinute,
+                        const dayWindows = [
+                          ...prev.filter((x) => x.dayOfWeek === dayOfWeek),
+                        ].sort((a, b) => a.startMinute - b.startMinute);
+                        const other = prev.filter(
+                          (x) => x.dayOfWeek !== dayOfWeek,
                         );
-                        const other = prev.filter((x) => x.dayOfWeek !== dayOfWeek);
                         const lastEnd = dayWindows.length
                           ? dayWindows[dayWindows.length - 1].endMinute
                           : hhmmToMinute("09:00");
-                        const startMinute = Math.min(lastEnd, hhmmToMinute("22:30"));
-                        const endMinute = Math.min(startMinute + 60, hhmmToMinute("23:59"));
+                        const startMinute = Math.min(
+                          lastEnd,
+                          hhmmToMinute("22:30"),
+                        );
+                        const endMinute = Math.min(
+                          startMinute + 60,
+                          hhmmToMinute("23:59"),
+                        );
                         dayWindows.push({
                           dayOfWeek,
                           startMinute,
-                          endMinute: Math.max(endMinute, startMinute + MIN_WINDOW_MINUTES),
+                          endMinute: Math.max(
+                            endMinute,
+                            startMinute + MIN_WINDOW_MINUTES,
+                          ),
                         });
                         return [...other, ...dayWindows];
                       });
                     }}
                   >
                     + Add time
+                  </Button>
+                  <div className="availability-days-dropdown">
+                    <button
+                      type="button"
+                      className="cc-input availability-days-summary"
+                      aria-label={`Choose days for ${label}`}
+                      title={selectedDaysLabel}
+                      onClick={() =>
+                        setOpenDayPickerByDay((prev) => ({
+                          ...prev,
+                          [dayOfWeek]: !prev[dayOfWeek],
+                        }))
+                      }
+                    >
+                      <span aria-hidden="true">📅</span>
+                      {selectedTargetDays.length > 0 ? (
+                        <span className="availability-days-count">
+                          {selectedTargetDays.length}
+                        </span>
+                      ) : null}
+                    </button>
+                    {isDayPickerOpen ? (
+                      <div className="availability-days-menu">
+                        {selectableTargetDays.map((targetDay) => {
+                          const checked =
+                            selectedTargetDays.includes(targetDay);
+                          return (
+                            <label
+                              key={targetDay}
+                              className="availability-days-option"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) => {
+                                  const nextChecked = e.target.checked;
+                                  setCopyTargetByDay((prev) => {
+                                    const current = prev[dayOfWeek] ?? [];
+                                    const next = nextChecked
+                                      ? Array.from(
+                                          new Set([...current, targetDay]),
+                                        )
+                                      : current.filter(
+                                          (day) => day !== targetDay,
+                                        );
+                                    return { ...prev, [dayOfWeek]: next };
+                                  });
+                                }}
+                              />
+                              <span>{DOW_FULL[targetDay]}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={
+                      windows.length === 0 || selectedTargetDays.length === 0
+                    }
+                    title={`Apply ${label} times to selected days`}
+                    aria-label={`Apply ${label} times to selected days`}
+                    onClick={() => {
+                      copyDayWindowsToDays(dayOfWeek, selectedTargetDays);
+                      setOpenDayPickerByDay((prev) => ({
+                        ...prev,
+                        [dayOfWeek]: false,
+                      }));
+                    }}
+                  >
+                    Apply
                   </Button>
                 </div>
               </div>
@@ -397,8 +652,12 @@ export function Availability() {
         </div>
 
         <div style={{ marginTop: 16 }}>
-          <div className="app-section-title" style={{ fontSize: 16 }}>Booking rules</div>
-          <div className="app-section-subtitle">Control timezone, notice period, and booking buffers.</div>
+          <div className="app-section-title" style={{ fontSize: 16 }}>
+            Booking rules
+          </div>
+          <div className="app-section-subtitle">
+            Control timezone, notice period, and booking buffers.
+          </div>
 
           <div className="availability-config-grid" style={{ marginTop: 12 }}>
             <div>
@@ -476,10 +735,14 @@ export function Availability() {
           </div>
         ) : null}
         {savedAt ? (
-          <div style={{ marginTop: 12, fontWeight: 900, color: 'var(--primary)' }}>Saved</div>
+          <div
+            style={{ marginTop: 12, fontWeight: 900, color: "var(--primary)" }}
+          >
+            Saved
+          </div>
         ) : null}
 
-        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'end' }}>
+        <div style={{ marginTop: 16, display: "flex", justifyContent: "end" }}>
           <Button
             disabled={saving || !selectedEventTypeId}
             onClick={async () => {
@@ -488,7 +751,7 @@ export function Availability() {
                 setError(null);
                 setSavedAt(null);
                 if (!selectedEventTypeId) {
-                  setError('Create an event type first');
+                  setError("Create an event type first");
                   return;
                 }
                 await api.updateEventTypeAvailability(selectedEventTypeId, {
@@ -508,11 +771,10 @@ export function Availability() {
               }
             }}
           >
-            {saving ? 'Saving…' : 'Save availability'}
+            {saving ? "Saving…" : "Save availability"}
           </Button>
         </div>
       </Card>
     </div>
   );
 }
-
