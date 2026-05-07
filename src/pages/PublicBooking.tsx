@@ -5,6 +5,7 @@ import { DateTime } from "luxon";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { api } from "../lib/api";
+import { getToken } from "../lib/auth";
 import { Button, Card, ErrorText, Input, Label } from "../components/ui";
 import "./PublicBooking.css";
 
@@ -32,6 +33,7 @@ export function PublicBooking() {
   const [booking, setBooking] = useState<any>(null);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [isHostPreview, setIsHostPreview] = useState(false);
 
   const rangeStart = useMemo(
     () => monthCursor.startOf("month").toUTC(),
@@ -71,6 +73,33 @@ export function PublicBooking() {
       }
     })();
   }, [safeUsername, safeEventSlug, monthCursor.toISODate()]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!safeUsername || !getToken()) {
+        if (!cancelled) setIsHostPreview(false);
+        return;
+      }
+      try {
+        const me = await api.me();
+        const loggedInUsername = String(me?.user?.username ?? me?.username ?? "")
+          .trim()
+          .toLowerCase();
+        if (!cancelled) {
+          setIsHostPreview(
+            loggedInUsername.length > 0 &&
+              loggedInUsername === safeUsername.toLowerCase(),
+          );
+        }
+      } catch {
+        if (!cancelled) setIsHostPreview(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [safeUsername]);
 
   const slotsByDay = useMemo(() => {
     const map = new Map<string, { startUtcISO: string; endUtcISO: string }[]>();
@@ -173,8 +202,12 @@ export function PublicBooking() {
   return (
     <div className="pb-wrap">
       <div className="pb-hero">
-        <h1>Book your meeting</h1>
-        <p>Pick your preferred date and time, then confirm with your details.</p>
+        <h1>{isHostPreview ? "Preview your availability" : "Book your meeting"}</h1>
+        <p>
+          {isHostPreview
+            ? "This is your public booking preview. You can review available dates and time slots."
+            : "Pick your preferred date and time, then confirm with your details."}
+        </p>
       </div>
       <div className="pb-grid">
       <Card>
@@ -275,7 +308,7 @@ export function PublicBooking() {
           </div>
         )}
 
-        {selected ? (
+        {selected && !isHostPreview ? (
           <form
             className="pb-form"
             onSubmit={async (e) => {

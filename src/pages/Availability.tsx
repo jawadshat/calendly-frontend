@@ -9,15 +9,6 @@ import "./AppShared.css";
 import "./Availability.css";
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-const DOW_FULL = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-] as const;
 const MIN_WINDOW_MINUTES = 30;
 
 function hhmmToMinute(s: string) {
@@ -66,12 +57,6 @@ export function Availability() {
   const [googleConnected, setGoogleConnected] = useState(false);
   const [googleEmail, setGoogleEmail] = useState<string | null>(null);
   const [googleStatus, setGoogleStatus] = useState<string | null>(null);
-  const [copyTargetByDay, setCopyTargetByDay] = useState<
-    Record<number, number[]>
-  >({});
-  const [openDayPickerByDay, setOpenDayPickerByDay] = useState<
-    Record<number, boolean>
-  >({});
 
   useEffect(() => {
     if (!getToken()) navigate("/login");
@@ -253,32 +238,6 @@ export function Availability() {
     setWeekly(Array.isArray(a.weekly) ? a.weekly : []);
   }
 
-  function copyDayWindowsToDays(sourceDayOfWeek: number, targetDays: number[]) {
-    const validTargetDays = targetDays.filter((day) => day !== sourceDayOfWeek);
-    if (validTargetDays.length === 0) return;
-    setWeekly((prev) => {
-      const sourceWindows = [
-        ...prev.filter((x) => x.dayOfWeek === sourceDayOfWeek),
-      ].sort((a, b) => a.startMinute - b.startMinute);
-      if (sourceWindows.length === 0) return prev;
-
-      const targetSet = new Set(validTargetDays);
-      const otherDays = prev.filter((x) => !targetSet.has(x.dayOfWeek));
-      const copiedWindows: Weekly[] = [];
-      for (const targetDay of validTargetDays) {
-        for (const win of sourceWindows) {
-          copiedWindows.push({
-            dayOfWeek: targetDay,
-            startMinute: win.startMinute,
-            endMinute: win.endMinute,
-          });
-        }
-      }
-      return [...otherDays, ...copiedWindows];
-    });
-    setSavedAt(null);
-  }
-
   return (
     <div className="availability-wrap">
       <div className="app-hero-card">
@@ -413,15 +372,6 @@ export function Availability() {
             const windows = [...(weeklyByDay.get(dayOfWeek) ?? [])].sort(
               (a, b) => a.startMinute - b.startMinute,
             );
-            const selectableTargetDays = DOW.map((_, i) => i).filter(
-              (i) => i !== dayOfWeek,
-            );
-            const selectedTargetDays = copyTargetByDay[dayOfWeek] ?? [];
-            const isDayPickerOpen = Boolean(openDayPickerByDay[dayOfWeek]);
-            const selectedDaysLabel =
-              selectedTargetDays.length === 0
-                ? "Select days"
-                : selectedTargetDays.map((day) => DOW_FULL[day]).join(", ");
 
             return (
               <div key={dayOfWeek} className="availability-week-row">
@@ -571,79 +521,6 @@ export function Availability() {
                     }}
                   >
                     + Add time
-                  </Button>
-                  <div className="availability-days-dropdown">
-                    <button
-                      type="button"
-                      className="cc-input availability-days-summary"
-                      aria-label={`Choose days for ${label}`}
-                      title={selectedDaysLabel}
-                      onClick={() =>
-                        setOpenDayPickerByDay((prev) => ({
-                          ...prev,
-                          [dayOfWeek]: !prev[dayOfWeek],
-                        }))
-                      }
-                    >
-                      <span aria-hidden="true">📅</span>
-                      {selectedTargetDays.length > 0 ? (
-                        <span className="availability-days-count">
-                          {selectedTargetDays.length}
-                        </span>
-                      ) : null}
-                    </button>
-                    {isDayPickerOpen ? (
-                      <div className="availability-days-menu">
-                        {selectableTargetDays.map((targetDay) => {
-                          const checked =
-                            selectedTargetDays.includes(targetDay);
-                          return (
-                            <label
-                              key={targetDay}
-                              className="availability-days-option"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={(e) => {
-                                  const nextChecked = e.target.checked;
-                                  setCopyTargetByDay((prev) => {
-                                    const current = prev[dayOfWeek] ?? [];
-                                    const next = nextChecked
-                                      ? Array.from(
-                                          new Set([...current, targetDay]),
-                                        )
-                                      : current.filter(
-                                          (day) => day !== targetDay,
-                                        );
-                                    return { ...prev, [dayOfWeek]: next };
-                                  });
-                                }}
-                              />
-                              <span>{DOW_FULL[targetDay]}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    ) : null}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    disabled={
-                      windows.length === 0 || selectedTargetDays.length === 0
-                    }
-                    title={`Apply ${label} times to selected days`}
-                    aria-label={`Apply ${label} times to selected days`}
-                    onClick={() => {
-                      copyDayWindowsToDays(dayOfWeek, selectedTargetDays);
-                      setOpenDayPickerByDay((prev) => ({
-                        ...prev,
-                        [dayOfWeek]: false,
-                      }));
-                    }}
-                  >
-                    Apply
                   </Button>
                 </div>
               </div>

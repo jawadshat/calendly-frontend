@@ -1,53 +1,91 @@
 /** Create/edit form for event type definitions used by public booking pages. */
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '../lib/api';
-import { getToken } from '../lib/auth';
-import { Button, Card, ErrorText, Input, Label, Textarea } from '../components/ui';
-import './AppChrome.css';
-import './AppShared.css';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../lib/api";
+import { getToken } from "../lib/auth";
+import {
+  Button,
+  Card,
+  ErrorText,
+  Input,
+  Label,
+  Textarea,
+} from "../components/ui";
+import "./AppChrome.css";
+import "./AppShared.css";
 
-export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
+function slugifyFromTitle(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export function EventTypeEditor(props: { mode: "new" | "edit" }) {
   const navigate = useNavigate();
   const params = useParams();
   const id = params.id!;
 
-  const [title, setTitle] = useState('Intro call');
-  const [slug, setSlug] = useState('intro-call');
+  const [title, setTitle] = useState("Intro call");
+  const [slug, setSlug] = useState("intro-call");
   const [durationMinutes, setDurationMinutes] = useState(30);
-  const [description, setDescription] = useState('');
+  const [durationMode, setDurationMode] = useState<"preset" | "custom">(
+    "preset",
+  );
+  const [description, setDescription] = useState("");
   const [isActive, setIsActive] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(props.mode === 'edit');
+  const [initialLoading, setInitialLoading] = useState(props.mode === "edit");
 
   useEffect(() => {
-    if (!getToken()) navigate('/login');
+    if (!getToken()) navigate("/login");
   }, [navigate]);
 
-  const heading = useMemo(() => (props.mode === 'new' ? 'Create event type' : 'Edit event type'), [props.mode]);
+  const heading = useMemo(
+    () => (props.mode === "new" ? "Create event type" : "Edit event type"),
+    [props.mode],
+  );
+  const durationOptions = useMemo(() => {
+    const base = [15, 30, 45, 60];
+    const all = Array.from(new Set([...base, durationMinutes])).sort(
+      (a, b) => a - b,
+    );
+    return all.map((minutes) => ({
+      value: minutes,
+      label: minutes === 60 ? "1 hour" : `${minutes} min`,
+    }));
+  }, [durationMinutes]);
 
   useEffect(() => {
     (async () => {
       try {
         setInitialLoading(true);
 
-        if (props.mode !== 'edit') return;
+        if (props.mode !== "edit") return;
 
         const { items } = await api.listEventTypes();
         const found = items.find((x) => x._id === id);
         if (!found) {
-          setError('Event type not found');
+          setError("Event type not found");
           return;
         }
         setTitle(found.title);
         setSlug(found.slug);
         setDurationMinutes(found.durationMinutes);
-        setDescription(found.description ?? '');
+        setDurationMode(
+          [15, 30, 45, 60].includes(found.durationMinutes)
+            ? "preset"
+            : "custom",
+        );
+        setDescription(found.description ?? "");
         setIsActive(found.isActive ?? true);
       } catch (e: any) {
-        setError(e?.error ?? 'Failed to load');
+        setError(e?.error ?? "Failed to load");
       } finally {
         setInitialLoading(false);
       }
@@ -55,13 +93,25 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.mode, id]);
 
-  if (initialLoading) return <div style={{ color: 'var(--muted)', fontWeight: 700 }}>Loading…</div>;
+  useEffect(() => {
+    if (props.mode !== "new") return;
+    const nextSlug = slugifyFromTitle(title);
+    setSlug(nextSlug || "event");
+  }, [props.mode, title]);
+
+  if (initialLoading)
+    return (
+      <div style={{ color: "var(--muted)", fontWeight: 700 }}>Loading…</div>
+    );
 
   return (
     <div className="editor-wrap">
       <div className="app-hero-card">
         <h1 className="app-hero-title">{heading}</h1>
-        <p className="app-hero-subtitle">Create professional event links with clear titles, durations, and descriptions.</p>
+        <p className="app-hero-subtitle">
+          Create professional event links with clear titles, durations, and
+          descriptions.
+        </p>
       </div>
 
       <Card>
@@ -72,26 +122,66 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
             <Label>Title</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-          <div>
-            <Label>Slug (URL)</Label>
-            <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
-          </div>
+          {props.mode === "edit" ? (
+            <div>
+              <Label>Slug (URL)</Label>
+              <Input value={slug} onChange={(e) => setSlug(e.target.value)} />
+            </div>
+          ) : null}
         </div>
 
         <div className="editor-grid" style={{ marginTop: 12 }}>
           <div>
             <Label>Duration (minutes)</Label>
-            <Input
-              value={String(durationMinutes)}
-              onChange={(e) => setDurationMinutes(Number(e.target.value))}
-              type="number"
-              min={5}
-              max={480}
-            />
+            <select
+              className="cc-input"
+              value={
+                durationMode === "custom" ? "custom" : String(durationMinutes)
+              }
+              onChange={(e) => {
+                const nextValue = e.target.value;
+                if (nextValue === "custom") {
+                  setDurationMode("custom");
+                  return;
+                }
+                setDurationMode("preset");
+                setDurationMinutes(Number(nextValue));
+              }}
+            >
+              {durationOptions.map((opt) => (
+                <option key={opt.value} value={String(opt.value)}>
+                  {opt.label}
+                </option>
+              ))}
+              <option value="custom">Custom</option>
+            </select>
+            {durationMode === "custom" ? (
+              <Input
+                style={{ marginTop: 8 }}
+                value={String(durationMinutes)}
+                onChange={(e) => setDurationMinutes(Number(e.target.value))}
+                type="number"
+                min={5}
+                max={480}
+                placeholder="Enter minutes"
+              />
+            ) : null}
           </div>
-          <div style={{ display: 'flex', alignItems: 'end', gap: 10 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, color: 'var(--muted)' }}>
-              <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
+          <div style={{ display: "flex", alignItems: "end", gap: 10 }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                fontWeight: 800,
+                color: "var(--muted)",
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+              />
               Active
             </label>
           </div>
@@ -99,7 +189,11 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
 
         <div style={{ marginTop: 12 }}>
           <Label>Description</Label>
-          <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional…" />
+          <Textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Optional…"
+          />
         </div>
 
         {error ? (
@@ -107,8 +201,15 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
             <ErrorText>{error}</ErrorText>
           </div>
         ) : null}
-        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', gap: 10 }}>
-          <Button variant="secondary" onClick={() => navigate('/dashboard')}>
+        <div
+          style={{
+            marginTop: 16,
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 10,
+          }}
+        >
+          <Button variant="secondary" onClick={() => navigate("/dashboard")}>
             Back
           </Button>
           <Button
@@ -117,25 +218,31 @@ export function EventTypeEditor(props: { mode: 'new' | 'edit' }) {
               try {
                 setLoading(true);
                 setError(null);
-                const payload = { title, slug, durationMinutes, description, isActive, locationType: 'google_meet' };
-                if (props.mode === 'new') {
+                const payload = {
+                  title,
+                  slug,
+                  durationMinutes,
+                  description,
+                  isActive,
+                  locationType: "google_meet",
+                };
+                if (props.mode === "new") {
                   await api.createEventType(payload);
                 } else {
                   await api.updateEventType(id, payload);
                 }
-                navigate('/dashboard');
+                navigate("/dashboard");
               } catch (e: any) {
-                setError(e?.error ?? 'Save failed');
+                setError(e?.error ?? "Save failed");
               } finally {
                 setLoading(false);
               }
             }}
           >
-            {loading ? 'Saving…' : 'Save'}
+            {loading ? "Saving…" : "Save"}
           </Button>
         </div>
       </Card>
     </div>
   );
 }
-
